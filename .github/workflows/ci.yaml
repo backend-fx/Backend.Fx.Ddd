@@ -17,7 +17,12 @@ jobs:
     name: nuke-build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
       - name: nuke build
         run: ./build.sh
         env:
