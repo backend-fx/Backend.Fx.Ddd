@@ -8,7 +8,7 @@ namespace Backend.Fx.Ddd.Feature
     /// are injected as scoped instances.
     /// </summary>
     [PublicAPI]
-    public class DomainServicesFeature : Execution.Features.Feature
+    public class DomainServicesFeature : Backend.Fx.Execution.Features.Feature
     {
         public override void Enable(IBackendFxApplication application)
         {
