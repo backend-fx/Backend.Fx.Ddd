@@ -6,9 +6,17 @@ updates:
     interval: "daily"
 
 - package-ecosystem: nuget
-  directory: "/src"
+  directory: "/"
   schedule:
     interval: daily
   open-pull-requests-limit: 10
   allow:
   - dependency-type: direct
+  groups:
+    nuget:
+      patterns:
+      - "*"
+      update-types:
+      - "major"
+      - "minor"
+      - "patch"
