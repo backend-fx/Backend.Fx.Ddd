@@ -6,65 +6,64 @@ using System.Threading.Tasks;
 using Backend.Fx.Exceptions;
 using JetBrains.Annotations;
 
-namespace Backend.Fx.Ddd
+namespace Backend.Fx.Ddd;
+
+/// <summary>
+/// Encapsulates methods for retrieving domain objects 
+/// See https://en.wikipedia.org/wiki/Domain-driven_design#Building_blocks
+/// </summary>
+[PublicAPI]
+public interface IRepository<TAggregateRoot, in TId> where TAggregateRoot : IAggregateRoot<TId> 
+    where TId : IEquatable<TId>
 {
     /// <summary>
-    /// Encapsulates methods for retrieving domain objects 
-    /// See https://en.wikipedia.org/wiki/Domain-driven_design#Building_blocks
+    /// Throws a <see cref="NotFoundException{TEntity}"/> when nothing matches the given id
     /// </summary>
-    [PublicAPI]
-    public interface IRepository<TAggregateRoot, in TId> where TAggregateRoot : IAggregateRoot<TId> 
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<TAggregateRoot> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns <c>null</c> when nothing matches the given id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<TAggregateRoot> GetByIdOrDefaultAsync(TId id, CancellationToken cancellationToken = default);
+
+    Task<TAggregateRoot[]> GetAllAsync(CancellationToken cancellationToken = default);
+
+    Task<bool> AnyAsync(CancellationToken cancellationToken = default);
+
+    Task<TAggregateRoot[]> ResolveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default);
+
+    Task DeleteAsync(TAggregateRoot aggregateRoot, CancellationToken cancellationToken = default);
+
+    Task AddAsync(TAggregateRoot aggregateRoot, CancellationToken cancellationToken = default);
+
+    Task AddRangeAsync(TAggregateRoot[] aggregateRoots, CancellationToken cancellationToken = default);
+}
+    
+[PublicAPI]
+public static class RepositoryEx
+{
+    public static async Task<TAggregateRoot[]> ResolveAsync<TAggregateRoot, TId>(
+        this IRepository<TAggregateRoot, TId> repository,
+        IEnumerable<TId> ids,
+        CancellationToken cancellationToken = default)
+        where TAggregateRoot : IAggregateRoot<TId>
         where TId : IEquatable<TId>
     {
-        /// <summary>
-        /// Throws a <see cref="NotFoundException{TEntity}"/> when nothing matches the given id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task<TAggregateRoot> GetAsync(TId id, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Returns <c>null</c> when nothing matches the given id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        Task<TAggregateRoot> FindAsync(TId id, CancellationToken cancellationToken = default);
-
-        Task<TAggregateRoot[]> GetAllAsync(CancellationToken cancellationToken = default);
-
-        Task<bool> AnyAsync(CancellationToken cancellationToken = default);
-
-        Task<TAggregateRoot[]> ResolveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default);
-
-        Task DeleteAsync(TAggregateRoot aggregateRoot, CancellationToken cancellationToken = default);
-
-        Task AddAsync(TAggregateRoot aggregateRoot, CancellationToken cancellationToken = default);
-
-        Task AddRangeAsync(TAggregateRoot[] aggregateRoots, CancellationToken cancellationToken = default);
-    }
-    
-    [PublicAPI]
-    public static class RepositoryEx
-    {
-        public static async Task<TAggregateRoot[]> ResolveAsync<TAggregateRoot, TId>(
-            this IRepository<TAggregateRoot, TId> repository,
-            IEnumerable<TId> ids,
-            CancellationToken cancellationToken = default)
-            where TAggregateRoot : IAggregateRoot<TId>
-            where TId : IEquatable<TId>
+        var idArray = ids as TId[] ?? ids.ToArray();
+        var resolved = new TAggregateRoot[idArray.Length];
+        using IExceptionBuilder builder = NotFoundException.UseBuilder();
+        for (var i = 0; i < idArray.Length; i++)
         {
-            var idArray = ids as TId[] ?? ids.ToArray();
-            var resolved = new TAggregateRoot[idArray.Length];
-            using IExceptionBuilder builder = NotFoundException.UseBuilder();
-            for (var i = 0; i < idArray.Length; i++)
-            {
-                resolved[i] = await repository.FindAsync(idArray[i], cancellationToken).ConfigureAwait(false);
-                builder.AddNotFoundWhenNull(idArray[i], resolved[i]);
-            }
-
-            return resolved;
+            resolved[i] = await repository.GetByIdOrDefaultAsync(idArray[i], cancellationToken).ConfigureAwait(false);
+            builder.AddNotFoundWhenNull(idArray[i], resolved[i]);
         }
+
+        return resolved;
     }
 }
