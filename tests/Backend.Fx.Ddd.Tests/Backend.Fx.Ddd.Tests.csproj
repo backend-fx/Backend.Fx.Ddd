@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Backend.Fx.Execution.SimpleInjector" Version="1.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageReference Include="xunit" Version="2.7.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
@@ -20,7 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Backend.Fx.Ddd\Backend.Fx.Ddd.csproj" />
+      <ProjectReference Include="..\..\src\Backend.Fx.Ddd.Events.Feature\Backend.Fx.Ddd.Events.Feature.csproj" />
+      <ProjectReference Include="..\..\src\Backend.Fx.Ddd.Feature\Backend.Fx.Ddd.Feature.csproj" />
     </ItemGroup>
 
 </Project>
