@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Reflection;
 using Backend.Fx.Execution.DependencyInjection;
 using Backend.Fx.Logging;
@@ -21,10 +22,10 @@ namespace Backend.Fx.Ddd.Feature
 
         public void Register(ICompositionRoot compositionRoot)
         {
-            RegisterDomainAndApplicationServices(compositionRoot);
+            RegisterDomainServices(compositionRoot);
         }
 
-        private void RegisterDomainAndApplicationServices(ICompositionRoot container)
+        private void RegisterDomainServices(ICompositionRoot container)
         {
             _logger.LogDebug("Registering domain and application services from {Assemblies}", _assembliesForLogging);
 
@@ -32,8 +33,7 @@ namespace Backend.Fx.Ddd.Feature
                 .SelectMany(type =>
                     type.GetTypeInfo()
                         .ImplementedInterfaces
-                        .Where(i => typeof(IDomainService) != i
-                                    && _assemblies.Contains(i.GetTypeInfo().Assembly))
+                        .Where(i => typeof(IDomainService) != i && _assemblies.Contains(i.GetTypeInfo().Assembly))
                         .Select(service => new ServiceDescriptor(service, type, ServiceLifetime.Scoped)));
 
 
@@ -42,6 +42,7 @@ namespace Backend.Fx.Ddd.Feature
                 _logger.LogDebug("Registering scoped service {ServiceType} with implementation {ImplementationType}",
                     serviceDescriptor.ServiceType.Name,
                     serviceDescriptor.ImplementationType?.Name ?? "dynamic");
+                
                 container.Register(serviceDescriptor);
             }
         }

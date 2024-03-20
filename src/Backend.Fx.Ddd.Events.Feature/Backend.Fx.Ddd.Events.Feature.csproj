@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -13,9 +13,9 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
-
+    
     <ItemGroup>
-      <ProjectReference Include="..\Backend.Fx.Ddd\Backend.Fx.Ddd.csproj" />
+      <ProjectReference Include="..\Backend.Fx.Ddd.Events\Backend.Fx.Ddd.Events.csproj" />
     </ItemGroup>
 
 </Project>
