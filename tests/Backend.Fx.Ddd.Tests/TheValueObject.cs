@@ -14,6 +14,8 @@ public class TheValueObject
     public void ObjectIsNotEqualToNull()
     {
         Assert.False(_sut1.Equals(null));
+        Assert.False(_sut1 == null);
+        Assert.True(_sut1 != null);
     }
     
     [Fact]
@@ -34,6 +36,9 @@ public class TheValueObject
     {
         Assert.Equal(_sut1, _sut1);
         Assert.True(_sut1.Equals(_sut1));
+#pragma warning disable CS1718 // Comparison made to same variable
+        Assert.True(_sut1 == _sut1);
+        Assert.False(_sut1 != _sut1);
     }
     
     [Fact]
@@ -41,6 +46,8 @@ public class TheValueObject
     {
         Assert.Equal(_sut1, _sut2);
         Assert.True(_sut1.Equals(_sut2));
+        Assert.True(_sut1 == _sut2);
+        Assert.False(_sut1 != _sut2);
     }
     
     [Fact]
@@ -48,6 +55,8 @@ public class TheValueObject
     {
         Assert.NotEqual(_sut1, _sut3);
         Assert.False(_sut1.Equals(_sut3));
+        Assert.False(_sut1 == _sut3);
+        Assert.True(_sut1 != _sut3);
     }
     
     [Fact]
@@ -55,6 +64,8 @@ public class TheValueObject
     {
         Assert.NotEqual(_sut1, _sut4);
         Assert.False(_sut1.Equals(_sut4));
+        Assert.False(_sut1 == _sut4);
+        Assert.True(_sut1 != _sut4);
     }
 
     private class Sut(string property) : ValueObject
