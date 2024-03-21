@@ -44,6 +44,9 @@ public abstract class ValueObject : IEquatable<ValueObject>
             return hash;
         }
     }
+    public static bool operator ==(ValueObject left, ValueObject right) => Equals(left, right);
+
+    public static bool operator !=(ValueObject left, ValueObject right) => !Equals(left, right);
 }
 
 public abstract class ComparableValueObject : ValueObject, IComparable
