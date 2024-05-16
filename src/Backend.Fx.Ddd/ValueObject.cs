@@ -15,9 +15,9 @@ public abstract class ValueObject : IEquatable<ValueObject>
     ///     When overriden in a derived class, returns all components of a value objects which constitute its identity.
     /// </summary>
     /// <returns>An ordered list of equality components.</returns>
-    protected abstract IEnumerable<object> GetEqualityComponents();
+    protected abstract IEnumerable<object?> GetEqualityComponents();
 
-    public bool Equals(ValueObject other)
+    public bool Equals(ValueObject? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (ReferenceEquals(null, other)) return false;
@@ -46,7 +46,7 @@ public abstract class ValueObject : IEquatable<ValueObject>
             return hash;
         }
     }
-    public static bool operator ==(ValueObject left, ValueObject right) => Equals(left, right);
+    public static bool operator ==(ValueObject? left, ValueObject? right) => Equals(left, right);
 
-    public static bool operator !=(ValueObject left, ValueObject right) => !Equals(left, right);
+    public static bool operator !=(ValueObject? left, ValueObject? right) => !Equals(left, right);
 }
