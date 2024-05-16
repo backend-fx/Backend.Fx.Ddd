@@ -55,6 +55,16 @@ public class TheValueObject
     }
 
     [Fact]
+    public void EquivalentObjectIsEqualEvenWhenBoxed()
+    {
+        var sut1 = new BoxedSut(1);
+        var sut2 = new BoxedSut(1);
+        Assert.Equal(sut1, sut2);
+        Assert.True(sut1.Equals(sut2));
+        Assert.True(sut1 == sut2);
+    }
+
+    [Fact]
     public void NonEquivalentObjectIsNotEqual()
     {
         Assert.NotEqual(_sut1, _sut3);
@@ -76,6 +86,17 @@ public class TheValueObject
     {
         [PublicAPI]
         public string? Property { get; } = property;
+
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Property;
+        }
+    }
+
+    private class BoxedSut(int property) : ValueObject
+    {
+        [PublicAPI]
+        public int Property { get; } = property;
 
         protected override IEnumerable<object?> GetEqualityComponents()
         {
