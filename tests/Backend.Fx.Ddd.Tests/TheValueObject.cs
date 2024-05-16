@@ -37,10 +37,12 @@ public class TheValueObject
     {
         Assert.Equal(_sut1, _sut1);
         Assert.True(_sut1.Equals(_sut1));
+#pragma warning disable CS1718 // Comparison made to same variable
         // ReSharper disable once EqualExpressionComparison
         Assert.True(_sut1 == _sut1);
         // ReSharper disable once EqualExpressionComparison
         Assert.False(_sut1 != _sut1);
+#pragma warning restore CS1718
     }
 
     [Fact]

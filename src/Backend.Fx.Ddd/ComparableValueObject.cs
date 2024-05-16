@@ -7,7 +7,7 @@ namespace Backend.Fx.Ddd;
 [PublicAPI]
 public abstract class ComparableValueObject : ValueObject, IComparable
 {
-    public int CompareTo(object obj)
+    public int CompareTo(object? obj)
     {
         if (ReferenceEquals(this, obj))
         {
