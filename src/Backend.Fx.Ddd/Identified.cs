@@ -44,7 +44,7 @@ public abstract class Identified<TId> : IEquatable<Identified<TId>> where TId : 
         return Id.GetHashCode();
     }
 
-    public static bool operator ==(Identified<TId> left, Identified<TId> right)
+    public static bool operator ==(Identified<TId>? left, Identified<TId>? right)
     {
         if (ReferenceEquals(left, null) && ReferenceEquals(right, null)) return true;
         if (ReferenceEquals(left, null) || ReferenceEquals(right, null)) return false;
@@ -53,7 +53,7 @@ public abstract class Identified<TId> : IEquatable<Identified<TId>> where TId : 
 
     }
 
-    public static bool operator !=(Identified<TId> left, Identified<TId> right)
+    public static bool operator !=(Identified<TId>? left, Identified<TId>? right)
     {
         return !(left == right);
     }
