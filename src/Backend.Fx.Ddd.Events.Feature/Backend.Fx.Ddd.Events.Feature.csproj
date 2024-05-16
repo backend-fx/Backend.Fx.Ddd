@@ -5,6 +5,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <LangVersion>11</LangVersion>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,7 +14,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     </ItemGroup>
-    
+
     <ItemGroup>
       <ProjectReference Include="..\Backend.Fx.Ddd.Events\Backend.Fx.Ddd.Events.csproj" />
     </ItemGroup>
