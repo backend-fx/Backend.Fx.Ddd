@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -30,7 +29,7 @@ internal class DomainEventsModule : IModule
             ServiceDescriptor.Scoped(sp => new DomainEventAggregator(new DomainEventHandlerProvider(sp))));
 
         compositionRoot.Register(
-            ServiceDescriptor.Scoped<IDomainEventAggregator>(sp => sp.GetRequiredService<DomainEventAggregator>()));
+            ServiceDescriptor.Scoped(sp => sp.GetRequiredService<DomainEventAggregator>()));
 
         compositionRoot.Register(
             ServiceDescriptor.Scoped<IDomainEventPublisher>(sp => sp.GetRequiredService<DomainEventAggregator>()));
@@ -94,21 +93,5 @@ internal class DomainEventsModule : IModule
         }
     }
 
-    private class DomainEventHandlerProvider : IDomainEventHandlerProvider
-    {
-        private readonly IServiceProvider _serviceProvider;
-
-        public DomainEventHandlerProvider(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
-
-        public IEnumerable<IDomainEventHandler<TDomainEvent>> GetAllEventHandlers<TDomainEvent>()
-            where TDomainEvent : IDomainEvent
-        {
-            Type eventType = typeof(TDomainEvent);
-            var handlerType = typeof(IDomainEventHandler<>).MakeGenericType(eventType);
-            return _serviceProvider.GetServices(handlerType).Cast<IDomainEventHandler<TDomainEvent>>();
-        }
-    }
+    
 }

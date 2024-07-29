@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Backend.Fx.Exceptions;
@@ -34,6 +33,4 @@ public interface IRepository<TAggregateRoot, in TId> where TAggregateRoot : IAgg
     Task<TAggregateRoot[]> GetAllAsync(CancellationToken cancellationToken = default);
 
     Task<bool> AnyAsync(CancellationToken cancellationToken = default);
-
-    Task<TAggregateRoot[]> ResolveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default);
 }

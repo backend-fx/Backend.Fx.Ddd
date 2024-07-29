@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Backend.Fx.Logging;
 using Microsoft.Extensions.Logging;
 
-namespace Backend.Fx.Ddd.Events;
+namespace Backend.Fx.Ddd.Events.Feature;
 
 /// <summary>
 /// Channel events from multiple objects into a single object to simplify registration for clients.
@@ -19,10 +19,10 @@ public interface IDomainEventAggregator
 public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublisher
 {
     private readonly ILogger _logger = Log.Create<DomainEventAggregator>();
-    private readonly IDomainEventHandlerProvider _domainEventHandlerProvider;
+    private readonly DomainEventHandlerProvider _domainEventHandlerProvider;
     private readonly ConcurrentQueue<HandleAction> _handleActions = new();
 
-    public DomainEventAggregator(IDomainEventHandlerProvider domainEventHandlerProvider)
+    public DomainEventAggregator(DomainEventHandlerProvider domainEventHandlerProvider)
     {
         _domainEventHandlerProvider = domainEventHandlerProvider;
     }
