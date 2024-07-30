@@ -23,7 +23,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Backend.Fx.Ddd.Events.Feature\Backend.Fx.Ddd.Events.Feature.csproj" />
       <ProjectReference Include="..\..\src\Backend.Fx.Ddd.Feature\Backend.Fx.Ddd.Feature.csproj" />
     </ItemGroup>
 

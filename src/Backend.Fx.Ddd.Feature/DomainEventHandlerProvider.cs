@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Backend.Fx.Ddd.Events;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Backend.Fx.Ddd.Events.Feature;
+namespace Backend.Fx.Ddd.Feature;
 
 public class DomainEventHandlerProvider
 {
