@@ -1,5 +1,8 @@
 # `Backend.Fx.Ddd`: Domain Driven Design Building Blocks
 
+[![NuGet version (Backend.Fx.Ddd)](https://img.shields.io/nuget/v/Backend.Fx.Ddd.svg?style=flat-square)](https://www.nuget.org/packages/Backend.Fx.Ddd/)
+
+
 Provides basic types as foundation for a strongly typed and interpretation free domain model.
 
 ### Type overview
@@ -12,6 +15,7 @@ Provides basic types as foundation for a strongly typed and interpretation free 
 | `IDomainService` | Marks a service as domain service. When using the `DomainServicesFeature` in a `BackendFxApplication`, all domain service types are auto wired with a scoped lifetime. |
 | `IIdGenerator` | Defines the generator of strongly typed identity values |
 | `IRepository` | Defines a minimal repository that retrieves `IAggregateRoot` instances. |
+| `StringValueObject` | Base class for modelling textual properties as type safe string values. |
 | `ValueObject` | Base class for anything that has attributes but lacks a conceptual identity value. Instances are considered equal when all attributes are equal. |
 
 ### Usage
@@ -32,7 +36,9 @@ public class MyCoolApplication
 }
 ``` 
 
-# `Backend.Fx.Ddd.Events`
+# `Backend.Fx.Ddd.Events`: Domain Events implementation
+
+[![NuGet version (Backend.Fx.Ddd.Events)](https://img.shields.io/nuget/v/Backend.Fx.Ddd.Events.svg?style=flat-square)](https://www.nuget.org/packages/Backend.Fx.Ddd.Events/)
 
 A simple, yet powerful implementation of the _Domain Events_ pattern. Domain events can be raised from inside any domain service, and can be handled by zero, one or many independent handlers. Those events are handled inside the same transactional boundary and a failing handler will result in a roll back.
 
