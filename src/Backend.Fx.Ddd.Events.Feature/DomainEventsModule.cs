@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -94,21 +93,5 @@ internal class DomainEventsModule : IModule
         }
     }
 
-    private class DomainEventHandlerProvider : IDomainEventHandlerProvider
-    {
-        private readonly IServiceProvider _serviceProvider;
-
-        public DomainEventHandlerProvider(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
-
-        public IEnumerable<IDomainEventHandler<TDomainEvent>> GetAllEventHandlers<TDomainEvent>()
-            where TDomainEvent : IDomainEvent
-        {
-            Type eventType = typeof(TDomainEvent);
-            var handlerType = typeof(IDomainEventHandler<>).MakeGenericType(eventType);
-            return _serviceProvider.GetServices(handlerType).Cast<IDomainEventHandler<TDomainEvent>>();
-        }
-    }
+    
 }
