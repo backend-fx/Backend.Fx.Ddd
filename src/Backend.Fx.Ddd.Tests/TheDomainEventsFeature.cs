@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Backend.Fx.Ddd.Events;
-using Backend.Fx.Ddd.Events.Feature;
+using Backend.Fx.Ddd.Feature;
 using Backend.Fx.Execution;
 using Backend.Fx.Execution.SimpleInjector;
 using Backend.Fx.Logging;

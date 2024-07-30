@@ -2,10 +2,11 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
+using Backend.Fx.Ddd.Events;
 using Backend.Fx.Logging;
 using Microsoft.Extensions.Logging;
 
-namespace Backend.Fx.Ddd.Events.Feature;
+namespace Backend.Fx.Ddd.Feature;
 
 /// <summary>
 /// Channel events from multiple objects into a single object to simplify registration for clients.

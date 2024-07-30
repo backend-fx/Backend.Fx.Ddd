@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Backend.Fx.Execution.Abstractions" Version="1.0.12" />
+        <PackageReference Include="Backend.Fx.Execution" Version="1.0.15" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
@@ -17,6 +17,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Backend.Fx.Ddd\Backend.Fx.Ddd.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Events\" />
     </ItemGroup>
 
 </Project>

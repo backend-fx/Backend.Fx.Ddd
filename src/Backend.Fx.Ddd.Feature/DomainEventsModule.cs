@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Backend.Fx.Ddd.Events;
 using Backend.Fx.Execution.DependencyInjection;
 using Backend.Fx.Execution.Pipeline;
 using Backend.Fx.Logging;
@@ -11,7 +12,7 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Backend.Fx.Ddd.Events.Feature;
+namespace Backend.Fx.Ddd.Feature;
 
 internal class DomainEventsModule : IModule
 {

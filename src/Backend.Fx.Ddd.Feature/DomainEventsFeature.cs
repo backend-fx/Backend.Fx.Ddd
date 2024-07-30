@@ -1,8 +1,9 @@
+using Backend.Fx.Ddd.Events;
 using Backend.Fx.Execution;
 using Backend.Fx.Execution.Pipeline;
 using JetBrains.Annotations;
 
- namespace Backend.Fx.Ddd.Events.Feature;
+namespace Backend.Fx.Ddd.Feature;
 
 /// <summary>
 /// The feature "Domain Events" provides you with a domain event aggregator, that will be injected as a scoped
