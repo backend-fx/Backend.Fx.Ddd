@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Backend.Fx.Exceptions;
@@ -13,7 +11,7 @@ namespace Backend.Fx.Ddd;
 /// See https://en.wikipedia.org/wiki/Domain-driven_design#Building_blocks
 /// </summary>
 [PublicAPI]
-public interface IRepository<TAggregateRoot, in TId> where TAggregateRoot : IAggregateRoot<TId> 
+public interface IRepository<TAggregateRoot, in TId> where TAggregateRoot : IAggregateRoot<TId>
     where TId : IEquatable<TId>
 {
     /// <summary>
@@ -35,35 +33,4 @@ public interface IRepository<TAggregateRoot, in TId> where TAggregateRoot : IAgg
     Task<TAggregateRoot[]> GetAllAsync(CancellationToken cancellationToken = default);
 
     Task<bool> AnyAsync(CancellationToken cancellationToken = default);
-
-    Task<TAggregateRoot[]> ResolveAsync(IEnumerable<TId> ids, CancellationToken cancellationToken = default);
-
-    Task DeleteAsync(TAggregateRoot aggregateRoot, CancellationToken cancellationToken = default);
-
-    Task AddAsync(TAggregateRoot aggregateRoot, CancellationToken cancellationToken = default);
-
-    Task AddRangeAsync(TAggregateRoot[] aggregateRoots, CancellationToken cancellationToken = default);
-}
-    
-[PublicAPI]
-public static class RepositoryEx
-{
-    public static async Task<TAggregateRoot[]> ResolveAsync<TAggregateRoot, TId>(
-        this IRepository<TAggregateRoot, TId> repository,
-        IEnumerable<TId> ids,
-        CancellationToken cancellationToken = default)
-        where TAggregateRoot : IAggregateRoot<TId>
-        where TId : IEquatable<TId>
-    {
-        var idArray = ids as TId[] ?? ids.ToArray();
-        var resolved = new TAggregateRoot[idArray.Length];
-        using IExceptionBuilder builder = NotFoundException.UseBuilder();
-        for (var i = 0; i < idArray.Length; i++)
-        {
-            resolved[i] = await repository.GetByIdOrDefaultAsync(idArray[i], cancellationToken).ConfigureAwait(false);
-            builder.AddNotFoundWhenNull(idArray[i], resolved[i]);
-        }
-
-        return resolved;
-    }
 }
