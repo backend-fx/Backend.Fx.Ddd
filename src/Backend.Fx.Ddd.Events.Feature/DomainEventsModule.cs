@@ -29,7 +29,7 @@ internal class DomainEventsModule : IModule
             ServiceDescriptor.Scoped(sp => new DomainEventAggregator(new DomainEventHandlerProvider(sp))));
 
         compositionRoot.Register(
-            ServiceDescriptor.Scoped(sp => sp.GetRequiredService<DomainEventAggregator>()));
+            ServiceDescriptor.Scoped<IDomainEventAggregator>(sp => sp.GetRequiredService<DomainEventAggregator>()));
 
         compositionRoot.Register(
             ServiceDescriptor.Scoped<IDomainEventPublisher>(sp => sp.GetRequiredService<DomainEventAggregator>()));
