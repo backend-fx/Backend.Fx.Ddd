@@ -35,35 +35,3 @@ public class MyCoolApplication
     }
 }
 ``` 
-
-# `Backend.Fx.Ddd.Events`: Domain Events implementation
-
-[![NuGet version (Backend.Fx.Ddd.Events)](https://img.shields.io/nuget/v/Backend.Fx.Ddd.Events.svg?style=flat-square)](https://www.nuget.org/packages/Backend.Fx.Ddd.Events/)
-
-A simple, yet powerful implementation of the _Domain Events_ pattern. Domain events can be raised from inside any domain service, and can be handled by zero, one or many independent handlers. Those events are handled inside the same transactional boundary and a failing handler will result in a roll back.
-
-### Type overview
-
-| Type | Usage |
-|---|---|
-| `IDomainEvent` | Marks a domain event |
-| `IDomainEventHandler` | Marks a handler for a domain event. Handlers are called in no specific order  before the `IOperation` completes. When using the `DomainEventsFeature` in a `BackendFxApplication`, all domain event handlers are auto wired with a scoped lifetime. |
-| `IDomainEventPublisher` | Defines the API to publish domain events from a domain service. When using the `DomainEventsFeature` in a `BackendFxApplication`, a suitable implementation will be injected to the requesting service. |
-
-### Usage
-
-1. Add a dependency to `Backend.Fx.Ddd.Events` in your domain assembly
-1. Add a dependency to `Backend.Fx.Ddd.Events.Feature` in your composition assembly (that's the assembly where your `BackendFxApplication` lives)
-1. register the feature in the application
-
-```csharp
-public class MyCoolApplication 
-{
-    public MyCoolApplication() : base(new SimpleInjectorCompositionRoot(), new ExceptionLogger(), GetAssemblies())
-    {
-        CompositionRoot.RegisterModules( ... );
-
-        EnableFeature(new DomainEventsFeature());
-    }
-}
-``` 
