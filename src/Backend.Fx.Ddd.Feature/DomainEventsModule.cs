@@ -93,6 +93,4 @@ internal class DomainEventsModule : IModule
             return _operation.CancelAsync(cancellationToken);
         }
     }
-
-    
 }

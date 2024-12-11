@@ -6,7 +6,7 @@ namespace Backend.Fx.Ddd;
 
 [PublicAPI]
 [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "}")]
-public abstract class Identified<TId> : IEquatable<Identified<TId>> where TId : struct
+public abstract class Identified<TId> : IEquatable<Identified<TId>>
 {
     public TId Id { get; init; }
 

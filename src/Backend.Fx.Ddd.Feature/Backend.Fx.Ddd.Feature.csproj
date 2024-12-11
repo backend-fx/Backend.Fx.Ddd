@@ -19,8 +19,4 @@
       <ProjectReference Include="..\Backend.Fx.Ddd\Backend.Fx.Ddd.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Events\" />
-    </ItemGroup>
-
 </Project>
