@@ -6,7 +6,7 @@ namespace Backend.Fx.Ddd;
 
 [PublicAPI]
 [DebuggerDisplay("{" + nameof(DebuggerDisplay) + "}")]
-public abstract class Identified<TId> : IEquatable<Identified<TId>> where TId : struct
+public abstract class Identified<TId> : IEquatable<Identified<TId>>
 {
     public TId Id { get; init; }
 
@@ -30,18 +30,18 @@ public abstract class Identified<TId> : IEquatable<Identified<TId>> where TId : 
 
     public bool Equals(Identified<TId> other)
     {
-        return !ReferenceEquals(other, null) && Id.Equals(other.Id);
+        return !ReferenceEquals(other, null) && Equals(Id, other.Id);
     }
 
     public override bool Equals(object? obj)
     {
         var other = obj as Identified<TId>;
-        return !ReferenceEquals(other, null) && Id.Equals(other.Id);
+        return !ReferenceEquals(other, null) && Equals(Id, other.Id);
     }
 
     public override int GetHashCode()
     {
-        return Id.GetHashCode();
+        return Id?.GetHashCode() ?? 0;
     }
 
     public static bool operator ==(Identified<TId>? left, Identified<TId>? right)
@@ -49,7 +49,7 @@ public abstract class Identified<TId> : IEquatable<Identified<TId>> where TId : 
         if (ReferenceEquals(left, null) && ReferenceEquals(right, null)) return true;
         if (ReferenceEquals(left, null) || ReferenceEquals(right, null)) return false;
 
-        return ReferenceEquals(left, right) || right.Id.Equals(left.Id);
+        return ReferenceEquals(left, right) || Equals(right.Id, left.Id);
 
     }
 
