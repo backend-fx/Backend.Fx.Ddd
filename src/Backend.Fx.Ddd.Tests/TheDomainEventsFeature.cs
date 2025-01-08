@@ -29,11 +29,11 @@ public class TheDomainEventsFeature : IAsyncLifetime
     }
 
     [Fact]
-    public void RaisedEventIsHandledOnCompleteOfOperation()
+    public async Task RaisedEventIsHandledOnCompleteOfOperation()
     {
         var domainEvent = new TestEvent();
 
-        _app.Invoker.InvokeAsync((sp, _) =>
+        await _app.Invoker.InvokeAsync((sp, _) =>
         {
             sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent);
 
@@ -52,7 +52,40 @@ public class TheDomainEventsFeature : IAsyncLifetime
         A.CallTo(() => UnusedTestEventHandler.Fake.HandleAsync(A<UnusedTestEvent>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
+    
+    [Fact]
+    public async Task RaisedEventIsHandledOnCompleteOfOperationUsingOutboxPattern()
+    {
+        var domainEvent = new TestEvent();
 
+        await _app.Invoker.InvokeAsync((sp, _) =>
+        {
+            var entity = new EntityWithDomainEvents();
+            entity.DomainEvents.Add(domainEvent);
+            
+            sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvents(entity);
+
+            // handling is postponed to the completion of the operation
+            A.CallTo(() => TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
+                .MustNotHaveHappened();
+
+            return Task.CompletedTask;
+        });
+
+        // now it must be handled
+        A.CallTo(() => TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+
+        // this one was not touched
+        A.CallTo(() => UnusedTestEventHandler.Fake.HandleAsync(A<UnusedTestEvent>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    public class EntityWithDomainEvents : IHaveDomainEvents
+    {
+        public DomainEventOutBox DomainEvents { get; } = new();
+    }
+    
     public class TestEvent : IDomainEvent;
 
     [UsedImplicitly]

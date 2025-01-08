@@ -22,4 +22,10 @@ public class DomainEventHandlerProvider
         var handlerType = typeof(IDomainEventHandler<>).MakeGenericType(eventType);
         return _serviceProvider.GetServices(handlerType).Cast<IDomainEventHandler<TDomainEvent>>();
     }
+    
+    public IEnumerable<object> GetAllEventHandlers(Type domainEventType)
+    {
+        var handlerType = typeof(IDomainEventHandler<>).MakeGenericType(domainEventType);
+        return _serviceProvider.GetServices(handlerType)!;
+    }
 }
