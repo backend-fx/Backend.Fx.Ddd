@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Backend.Fx.Ddd.Events;
@@ -19,29 +20,49 @@ public interface IDomainEventAggregator
 
 public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublisher
 {
+    private static readonly ConcurrentDictionary<Type, MethodInfo> HandleMethods = new();
     private readonly ILogger _logger = Log.Create<DomainEventAggregator>();
     private readonly DomainEventHandlerProvider _domainEventHandlerProvider;
     private readonly ConcurrentQueue<HandleAction> _handleActions = new();
-
+    
     public DomainEventAggregator(DomainEventHandlerProvider domainEventHandlerProvider)
     {
         _domainEventHandlerProvider = domainEventHandlerProvider;
     }
-
-    public void PublishDomainEvent<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent
+    
+    public void PublishDomainEvent(IDomainEvent domainEvent)
     {
-        foreach (var injectedHandler in _domainEventHandlerProvider.GetAllEventHandlers<TDomainEvent>())
+        var domainEventType = domainEvent.GetType();
+
+        foreach (var injectedHandler in _domainEventHandlerProvider.GetAllEventHandlers(domainEventType))
         {
-            var handleAction = new HandleAction(
-                typeof(TDomainEvent),
+            var handleMethod = HandleMethods.GetOrAdd(
                 injectedHandler.GetType(),
-                ct => injectedHandler.HandleAsync(domainEvent, ct));
+                type => type.GetMethod("HandleAsync", BindingFlags.Instance | BindingFlags.Public));
+                
+            var handleAction = new HandleAction(
+                domainEventType,
+                injectedHandler.GetType(),
+                ct => (Task)handleMethod.Invoke(injectedHandler, new object[] { domainEvent, ct }));
 
             _handleActions.Enqueue(handleAction);
             _logger.LogDebug(
                 "Invocation of {HandlerTypeName} for domain event {DomainEvent} registered. It will be executed on completion of operation",
                 injectedHandler.GetType().Name,
                 domainEvent);
+        }
+    }
+
+    public void PublishDomainEvents(IHaveDomainEvents entity)
+    {
+        PublishDomainEventsFromOutBox(entity.DomainEvents);
+    }
+    
+    public void PublishDomainEventsFromOutBox(DomainEventOutBox outBox)
+    {
+        foreach (var domainEvent in outBox)
+        {
+            PublishDomainEvent(domainEvent);
         }
     }
 

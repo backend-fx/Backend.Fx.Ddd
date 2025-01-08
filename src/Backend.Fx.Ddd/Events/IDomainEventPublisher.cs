@@ -9,7 +9,10 @@ public interface IDomainEventPublisher
     /// Publish a domain event that is handled by all handlers asynchronously in the same scope/transaction.
     /// Possible exceptions are not caught, so that your action might fail due to a failing event handler.
     /// </summary>
-    /// <typeparam name="TDomainEvent"></typeparam>
     /// <param name="domainEvent"></param>
-    void PublishDomainEvent<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent;
+    void PublishDomainEvent(IDomainEvent domainEvent);
+    
+    void PublishDomainEventsFromOutBox(DomainEventOutBox outBox);
+    
+    void PublishDomainEvents(IHaveDomainEvents entity);
 }
