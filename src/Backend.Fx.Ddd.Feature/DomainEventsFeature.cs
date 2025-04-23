@@ -1,5 +1,6 @@
 using Backend.Fx.Ddd.Events;
 using Backend.Fx.Execution;
+using Backend.Fx.Execution.Features;
 using Backend.Fx.Execution.Pipeline;
 using JetBrains.Annotations;
 
@@ -14,9 +15,9 @@ namespace Backend.Fx.Ddd.Feature;
 /// possible transaction.
 /// </summary>
 [PublicAPI]
-public class DomainEventsFeature : Execution.Features.Feature
+public class DomainEventsFeature : IFeature
 {
-    public override void Enable(IBackendFxApplication application)
+    public void Enable(IBackendFxApplication application)
     {
         application.CompositionRoot.RegisterModules(new DomainEventsModule(application.Assemblies));
     }

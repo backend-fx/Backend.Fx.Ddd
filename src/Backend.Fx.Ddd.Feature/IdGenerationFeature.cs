@@ -1,4 +1,5 @@
 using Backend.Fx.Execution;
+using Backend.Fx.Execution.Features;
 using JetBrains.Annotations;
 
 namespace Backend.Fx.Ddd.Feature;
@@ -8,9 +9,9 @@ namespace Backend.Fx.Ddd.Feature;
 /// as singleton instances. 
 /// </summary>
 [PublicAPI]
-public class IdGenerationFeature : Backend.Fx.Execution.Features.Feature
+public class IdGenerationFeature : IFeature
 {
-    public override void Enable(IBackendFxApplication application)
+    public void Enable(IBackendFxApplication application)
     {
         application.CompositionRoot.RegisterModules(new IdGenerationModule(application.Assemblies));
     }
