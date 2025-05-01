@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,16 +21,16 @@ public interface IDomainEventAggregator
 
 public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublisher
 {
-    private static readonly ConcurrentDictionary<Type, MethodInfo> HandleMethods = new();
+    private static readonly ConcurrentDictionary<Key, MethodInfo> HandleMethods = new();
     private readonly ILogger _logger = Log.Create<DomainEventAggregator>();
     private readonly DomainEventHandlerProvider _domainEventHandlerProvider;
     private readonly ConcurrentQueue<HandleAction> _handleActions = new();
-    
+
     public DomainEventAggregator(DomainEventHandlerProvider domainEventHandlerProvider)
     {
         _domainEventHandlerProvider = domainEventHandlerProvider;
     }
-    
+
     public void PublishDomainEvent(IDomainEvent domainEvent)
     {
         var domainEventType = domainEvent.GetType();
@@ -37,9 +38,16 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
         foreach (var injectedHandler in _domainEventHandlerProvider.GetAllEventHandlers(domainEventType))
         {
             var handleMethod = HandleMethods.GetOrAdd(
-                injectedHandler.GetType(),
-                type => type.GetMethod("HandleAsync", BindingFlags.Instance | BindingFlags.Public));
-                
+                new Key(injectedHandler.GetType(), domainEventType),
+                key => key
+                    .HandlerType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                    .SingleOrDefault(m =>
+                        m.Name == "HandleAsync" &&
+                        m.GetParameters().Length == 2 &&
+                        m.GetParameters()[0].ParameterType == domainEventType &&
+                        m.GetParameters()[1].ParameterType == typeof(CancellationToken)))
+                ?? throw new InvalidOperationException($"Handler {injectedHandler.GetType().Name} doesn't exist");
+
             var handleAction = new HandleAction(
                 domainEventType,
                 injectedHandler.GetType(),
@@ -57,7 +65,7 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
     {
         PublishDomainEventsFromOutBox(entity.DomainEvents);
     }
-    
+
     public void PublishDomainEventsFromOutBox(DomainEventOutBox outBox)
     {
         foreach (var domainEvent in outBox)
@@ -107,4 +115,6 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
             }
         }
     }
+
+    private record struct Key(Type HandlerType, Type DomainEventType);
 }
