@@ -5,16 +5,16 @@ using JetBrains.Annotations;
 namespace Backend.Fx.Ddd.Events;
 
 [PublicAPI]
-public class DomainEventOutBox : IEnumerable<IDomainEvent>
+public class DomainEventOutBox : IEnumerable<object>
 {
-    private readonly HashSet<IDomainEvent> _events = new();
+    private readonly HashSet<object> _events = new();
 
-    public void Add(IDomainEvent domainEvent)
+    public void Add(object domainEvent)
     {
         _events.Add(domainEvent);
     }
 
-    public IEnumerator<IDomainEvent> GetEnumerator()
+    public IEnumerator<object> GetEnumerator()
     {
         return _events.GetEnumerator();
     }

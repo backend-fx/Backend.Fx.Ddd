@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -6,17 +7,14 @@ using System.Threading.Tasks;
 using Backend.Fx.Ddd.Events;
 using Backend.Fx.Execution.DependencyInjection;
 using Backend.Fx.Execution.Pipeline;
-using Backend.Fx.Logging;
 using Backend.Fx.Util;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Backend.Fx.Ddd.Feature;
 
 internal class DomainEventsModule : IModule
 {
-    private readonly ILogger _logger = Log.Create<DomainEventsModule>();
     private readonly Assembly[] _assemblies;
 
     public DomainEventsModule(params Assembly[] assemblies)
@@ -42,23 +40,43 @@ internal class DomainEventsModule : IModule
 
     private void RegisterDomainEventHandlers(ICompositionRoot compositionRoot)
     {
-        foreach (Type domainEventType in _assemblies.GetImplementingTypes(typeof(IDomainEvent)))
-        {
-            Type handlerTypeForThisDomainEventType = typeof(IDomainEventHandler<>).MakeGenericType(domainEventType);
+        var handlerTypes = _assemblies
+            .Where(ass => !ass.IsDynamic)
+            .SelectMany(ass => ass.GetTypes())
+            .Where(t => !t.IsAbstract && t.IsClass)
+            .Where(t => t.IsImplementationOfOpenGenericInterface(typeof(IDomainEventHandler<>)));
 
-            var serviceDescriptors = _assemblies
-                .GetImplementingTypes(handlerTypeForThisDomainEventType)
-                .Select(t => new ServiceDescriptor(handlerTypeForThisDomainEventType, t, ServiceLifetime.Scoped))
+        var domainEventTypeToHandlerTypesMap = new Dictionary<Type, List<Type>>();
+
+        foreach (var handlerType in handlerTypes)
+        {
+            // a handler could handle various domain events, so we have to loop over the interface
+            var implementedInterfaces = handlerType
+                .GetInterfaces()
+                .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>))
                 .ToArray();
 
-            if (serviceDescriptors.Any())
+            foreach (var implementedInterface in implementedInterfaces)
             {
-                compositionRoot.RegisterCollection(serviceDescriptors);
+                var domainEventType = implementedInterface.GenericTypeArguments.Single();
+                if (domainEventTypeToHandlerTypesMap.ContainsKey(domainEventType))
+                {
+                    domainEventTypeToHandlerTypesMap[domainEventType].Add(handlerType);
+                }
+                else
+                {
+                    domainEventTypeToHandlerTypesMap[domainEventType] = new List<Type>([handlerType]);
+                }
             }
-            else
-            {
-                _logger.LogWarning("No handlers for {DomainEventType} found", domainEventType);
-            }
+        }
+
+        foreach (var registration in domainEventTypeToHandlerTypesMap)
+        {
+            var domainEventType = registration.Key;
+            var handlerService = typeof(IDomainEventHandler<>).MakeGenericType(domainEventType);
+            var serviceDescriptors = registration.Value.Select(
+                handlerType => new ServiceDescriptor(handlerService, handlerType, ServiceLifetime.Scoped)).ToArray();
+            compositionRoot.RegisterCollection(serviceDescriptors);
         }
     }
 

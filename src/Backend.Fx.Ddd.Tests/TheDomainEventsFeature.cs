@@ -114,11 +114,11 @@ public class TheDomainEventsFeature : IAsyncLifetime
         public DomainEventOutBox DomainEvents { get; } = new();
     }
 
-    public class TestEvent1 : IDomainEvent;
+    public class TestEvent1;
 
-    public class TestEvent2 : IDomainEvent;
+    public class TestEvent2;
 
-    public class TestEvent3 : IDomainEvent;
+    public class TestEvent3;
 
     [UsedImplicitly]
     public class TestEventHandler : IDomainEventHandler<TestEvent1>
@@ -149,7 +149,7 @@ public class TheDomainEventsFeature : IAsyncLifetime
     }
 
     [UsedImplicitly]
-    public class UnusedTestEvent : IDomainEvent;
+    public class UnusedTestEvent;
 
     [UsedImplicitly]
     public class UnusedTestEventHandler : IDomainEventHandler<UnusedTestEvent>

@@ -10,7 +10,7 @@ public interface IDomainEventPublisher
     /// Possible exceptions are not caught, so that your action might fail due to a failing event handler.
     /// </summary>
     /// <param name="domainEvent"></param>
-    void PublishDomainEvent(IDomainEvent domainEvent);
+    void PublishDomainEvent(object domainEvent);
     
     void PublishDomainEventsFromOutBox(DomainEventOutBox outBox);
     
