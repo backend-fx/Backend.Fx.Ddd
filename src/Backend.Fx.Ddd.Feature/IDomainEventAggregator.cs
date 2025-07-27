@@ -31,7 +31,7 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
         _domainEventHandlerProvider = domainEventHandlerProvider;
     }
 
-    public void PublishDomainEvent(IDomainEvent domainEvent)
+    public void PublishDomainEvent(object domainEvent) 
     {
         var domainEventType = domainEvent.GetType();
 

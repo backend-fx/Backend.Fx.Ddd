@@ -1,9 +1,11 @@
-﻿namespace Backend.Fx.Ddd.Events;
+﻿using System;
+
+namespace Backend.Fx.Ddd.Events;
 
 /// <summary>
-/// Marker interface for domain events that must be handled in the same scope and transaction of the publishing logic.
-/// Handlers are called through dependency injection
+/// Marker interface for domain events 
 /// </summary>
+[Obsolete("Not needed any more, any object can de a domain event now.")]
 public interface IDomainEvent
 {
 }

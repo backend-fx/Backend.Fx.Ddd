@@ -16,7 +16,7 @@ public class DomainEventHandlerProvider
     }
 
     public IEnumerable<IDomainEventHandler<TDomainEvent>> GetAllEventHandlers<TDomainEvent>()
-        where TDomainEvent : IDomainEvent
+        where TDomainEvent : class
     {
         Type eventType = typeof(TDomainEvent);
         var handlerType = typeof(IDomainEventHandler<>).MakeGenericType(eventType);
