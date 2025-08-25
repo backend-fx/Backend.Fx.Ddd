@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Reflection;
 using Backend.Fx.Execution;
 using Backend.Fx.Execution.Features;
 using JetBrains.Annotations;
@@ -15,4 +17,6 @@ public class DomainServicesFeature : IFeature
     {
         application.CompositionRoot.RegisterModules(new DomainServicesModule(application.Assemblies));
     }
+
+    public IEnumerable<Assembly> Assemblies { get; } = [];
 }

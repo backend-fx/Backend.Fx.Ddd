@@ -17,7 +17,7 @@ public class TheIdGenerationFeature : IAsyncLifetime
     public TheIdGenerationFeature()
     {
         _app = new TestApplication(GetType().Assembly);
-        _app.EnableFeature(new IdGenerationFeature());
+        _app.AddFeature(new IdGenerationFeature());
     }
 
     public async Task InitializeAsync()

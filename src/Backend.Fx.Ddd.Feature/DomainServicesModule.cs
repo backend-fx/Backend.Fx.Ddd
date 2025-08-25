@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Backend.Fx.Execution.DependencyInjection;
@@ -11,13 +12,12 @@ namespace Backend.Fx.Ddd.Feature;
 internal class DomainServicesModule : IModule
 {
     private readonly ILogger _logger = Log.Create<DomainServicesModule>();
-    private readonly Assembly[] _assemblies;
-    private readonly string _assembliesForLogging;
-
-    public DomainServicesModule(params Assembly[] assemblies)
+    private readonly IEnumerable<Assembly> _assemblies;
+    
+    public DomainServicesModule(IEnumerable<Assembly> assemblies)
     {
         _assemblies = assemblies;
-        _assembliesForLogging = string.Join(",", _assemblies.Select(ass => ass.GetName().Name));
+        
     }
 
     public void Register(ICompositionRoot compositionRoot)
@@ -27,7 +27,8 @@ internal class DomainServicesModule : IModule
 
     private void RegisterDomainServices(ICompositionRoot container)
     {
-        _logger.LogDebug("Registering domain and application services from {Assemblies}", _assembliesForLogging);
+        var assembliesForLogging = string.Join(",", _assemblies.Select(ass => ass.GetName().Name));
+        _logger.LogDebug("Registering domain and application services from {Assemblies}", assembliesForLogging);
 
         var serviceDescriptors = _assemblies
                                  .GetImplementingTypes(typeof(IDomainService))

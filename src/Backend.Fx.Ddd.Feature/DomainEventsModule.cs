@@ -15,9 +15,9 @@ namespace Backend.Fx.Ddd.Feature;
 
 internal class DomainEventsModule : IModule
 {
-    private readonly Assembly[] _assemblies;
+    private readonly IEnumerable<Assembly> _assemblies;
 
-    public DomainEventsModule(params Assembly[] assemblies)
+    public DomainEventsModule(IEnumerable<Assembly> assemblies)
     {
         _assemblies = assemblies;
     }
@@ -110,5 +110,7 @@ internal class DomainEventsModule : IModule
         {
             return _operation.CancelAsync(cancellationToken);
         }
+
+        public int Counter => _operation.Counter;
     }
 }
