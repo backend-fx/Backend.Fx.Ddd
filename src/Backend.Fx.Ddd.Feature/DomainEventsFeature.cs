@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Reflection;
 using Backend.Fx.Ddd.Events;
 using Backend.Fx.Execution;
 using Backend.Fx.Execution.Features;
@@ -21,4 +23,6 @@ public class DomainEventsFeature : IFeature
     {
         application.CompositionRoot.RegisterModules(new DomainEventsModule(application.Assemblies));
     }
+
+    public IEnumerable<Assembly> Assemblies { get; } = [];
 }

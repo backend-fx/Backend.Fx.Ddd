@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Backend.Fx.Execution.DependencyInjection;
@@ -12,9 +12,9 @@ namespace Backend.Fx.Ddd.Feature;
 public class IdGenerationModule : IModule
 {
     private readonly ILogger _logger = Log.Create<DomainEventsModule>();
-    private readonly Assembly[] _assemblies;
+    private readonly IEnumerable<Assembly> _assemblies;
 
-    public IdGenerationModule(params Assembly[] assemblies)
+    public IdGenerationModule(IEnumerable<Assembly> assemblies)
     {
         _assemblies = assemblies;
     }

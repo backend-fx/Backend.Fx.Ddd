@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Reflection;
 using Backend.Fx.Execution;
 using Backend.Fx.Execution.Features;
 using JetBrains.Annotations;
@@ -15,4 +17,6 @@ public class IdGenerationFeature : IFeature
     {
         application.CompositionRoot.RegisterModules(new IdGenerationModule(application.Assemblies));
     }
+
+    public IEnumerable<Assembly> Assemblies { get; } = [];
 }

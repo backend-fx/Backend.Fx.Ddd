@@ -17,7 +17,7 @@ public class TheOpenHostServiceFeature : IAsyncLifetime
     public TheOpenHostServiceFeature()
     {
         _app = new TestApplication(GetType().Assembly);
-        _app.EnableFeature(new OpenHostServicesFeature());
+        _app.AddFeature(new OpenHostServicesFeature());
     }
 
     public async Task InitializeAsync()

@@ -18,7 +18,7 @@ public class TheDomainServiceFeature : IAsyncLifetime
     public TheDomainServiceFeature()
     {
         _app = new TestApplication(GetType().Assembly);
-        _app.EnableFeature(new DomainServicesFeature());
+        _app.AddFeature(new DomainServicesFeature());
     }
 
     public async Task InitializeAsync()

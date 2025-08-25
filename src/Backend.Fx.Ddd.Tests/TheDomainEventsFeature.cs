@@ -20,7 +20,7 @@ public class TheDomainEventsFeature : IAsyncLifetime
     public TheDomainEventsFeature()
     {
         _app = new TestApplication(GetType().Assembly);
-        _app.EnableFeature(new DomainEventsFeature());
+        _app.AddFeature(new DomainEventsFeature());
     }
 
     public async Task InitializeAsync()
