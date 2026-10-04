@@ -21,7 +21,7 @@ public class TheDomainServiceFeature : IAsyncLifetime
         _app.AddFeature(new DomainServicesFeature());
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _app.BootAsync();
     }
@@ -40,10 +40,10 @@ public class TheDomainServiceFeature : IAsyncLifetime
             () => _app.CompositionRoot.ServiceProvider.GetRequiredService<IMyService>());
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         _app.Dispose();
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
 

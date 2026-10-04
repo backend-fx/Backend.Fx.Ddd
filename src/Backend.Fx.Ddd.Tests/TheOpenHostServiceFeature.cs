@@ -20,7 +20,7 @@ public class TheOpenHostServiceFeature : IAsyncLifetime
         _app.AddFeature(new OpenHostServicesFeature());
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _app.BootAsync();
     }
@@ -38,10 +38,10 @@ public class TheOpenHostServiceFeature : IAsyncLifetime
         _ = _app.CompositionRoot.ServiceProvider.GetRequiredService<IMyService>();
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         _app.Dispose();
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
 
