@@ -1,6 +1,4 @@
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Backend.Fx.Ddd.Events;
 using Backend.Fx.Ddd.Feature;
 using Backend.Fx.Execution;
@@ -109,6 +107,75 @@ public class TheDomainEventsFeature : IAsyncLifetime
     }
 
 
+    [Fact]
+    public async Task OutBoxIsEmptiedOnPublishingSoEventsAreNotHandledTwice()
+    {
+        var domainEvent = new TestEvent4();
+        var entity = new EntityWithDomainEvents();
+        entity.DomainEvents.Add(domainEvent);
+
+        await _app.Invoker.InvokeAsync((sp, _) =>
+        {
+            var publisher = sp.GetRequiredService<IDomainEventPublisher>();
+            publisher.PublishDomainEvents(entity);
+            publisher.PublishDomainEvents(entity);
+
+            Assert.Equal(0, entity.DomainEvents.Count);
+
+            return Task.CompletedTask;
+        }, cancellation: TestContext.Current.CancellationToken);
+
+        A.CallTo(() => ExplicitTestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public void OutBoxKeepsInsertionOrderAndDoesNotDeduplicateEqualEvents()
+    {
+        var outBox = new DomainEventOutBox();
+        var first = new RecordEvent(1);
+        var second = new RecordEvent(2);
+
+        outBox.Add(first);
+        outBox.Add(second);
+        outBox.Add(new RecordEvent(1));
+
+        Assert.Equal(3, outBox.Count);
+        Assert.Equal(new object[] { first, second, new RecordEvent(1) }, outBox);
+
+        var drained = outBox.Drain();
+        Assert.Equal(3, drained.Count);
+        Assert.Equal(0, outBox.Count);
+    }
+
+    [Fact]
+    public async Task ExplicitlyImplementedHandlersAreInvoked()
+    {
+        var domainEvent = new TestEvent4();
+
+        await _app.Invoker.InvokeAsync((sp, _) =>
+        {
+            sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent);
+            return Task.CompletedTask;
+        }, cancellation: TestContext.Current.CancellationToken);
+
+        A.CallTo(() => ExplicitTestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task FailingHandlerThrowsTheOriginalException()
+    {
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _app.Invoker.InvokeAsync((sp, _) =>
+            {
+                sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(new FailingTestEvent());
+                return Task.CompletedTask;
+            }, cancellation: TestContext.Current.CancellationToken));
+
+        Assert.Equal("handler failed", exception.Message);
+    }
+
     public class EntityWithDomainEvents : IHaveDomainEvents
     {
         public DomainEventOutBox DomainEvents { get; } = new();
@@ -119,6 +186,34 @@ public class TheDomainEventsFeature : IAsyncLifetime
     public class TestEvent2;
 
     public class TestEvent3;
+
+    public class TestEvent4;
+
+    public record RecordEvent(int Number);
+
+    public class FailingTestEvent;
+
+    [UsedImplicitly]
+    public class ExplicitTestEventHandler : IDomainEventHandler<TestEvent4>
+    {
+        public static readonly IDomainEventHandler<TestEvent4> Fake = A.Fake<IDomainEventHandler<TestEvent4>>();
+
+        async Task IDomainEventHandler<TestEvent4>.HandleAsync(
+            TestEvent4 domainEvent,
+            CancellationToken cancellationToken)
+        {
+            await Fake.HandleAsync(domainEvent, cancellationToken);
+        }
+    }
+
+    [UsedImplicitly]
+    public class FailingTestEventHandler : IDomainEventHandler<FailingTestEvent>
+    {
+        public Task HandleAsync(FailingTestEvent domainEvent, CancellationToken cancellationToken = default)
+        {
+            throw new InvalidOperationException("handler failed");
+        }
+    }
 
     [UsedImplicitly]
     public class TestEventHandler : IDomainEventHandler<TestEvent1>
