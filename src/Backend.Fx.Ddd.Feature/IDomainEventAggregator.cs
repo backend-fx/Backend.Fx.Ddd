@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using Backend.Fx.Ddd.Events;
 using Backend.Fx.Logging;
 using Microsoft.Extensions.Logging;
@@ -17,7 +18,7 @@ public interface IDomainEventAggregator
 
 public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublisher
 {
-    private static readonly ConcurrentDictionary<Key, MethodInfo> HandleMethods = new();
+    private static readonly ConcurrentDictionary<Type, MethodInfo> HandleMethods = new();
     private readonly ILogger _logger = Log.Create<DomainEventAggregator>();
     private readonly DomainEventHandlerProvider _domainEventHandlerProvider;
     private readonly ConcurrentQueue<HandleAction> _handleActions = new();
@@ -30,30 +31,49 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
     public void PublishDomainEvent(object domainEvent) 
     {
         var domainEventType = domainEvent.GetType();
+        var handleMethod = HandleMethods.GetOrAdd(
+            domainEventType,
+            t => typeof(IDomainEventHandler<>)
+                     .MakeGenericType(t)
+                     .GetMethod(nameof(IDomainEventHandler<object>.HandleAsync))
+                 ?? throw new InvalidOperationException(
+                     $"IDomainEventHandler<{t.Name}>.HandleAsync could not be found"));
 
         foreach (var injectedHandler in _domainEventHandlerProvider.GetAllEventHandlers(domainEventType))
         {
-            var handleMethod = HandleMethods.GetOrAdd(
-                new Key(injectedHandler.GetType(), domainEventType),
-                key => key
-                    .HandlerType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                    .SingleOrDefault(m =>
-                        m.Name == "HandleAsync" &&
-                        m.GetParameters().Length == 2 &&
-                        m.GetParameters()[0].ParameterType == domainEventType &&
-                        m.GetParameters()[1].ParameterType == typeof(CancellationToken)))
-                ?? throw new InvalidOperationException($"Handler {injectedHandler.GetType().Name} doesn't exist");
-
+            var handler = injectedHandler;
             var handleAction = new HandleAction(
                 domainEventType,
-                injectedHandler.GetType(),
-                ct => (Task)handleMethod.Invoke(injectedHandler, new object[] { domainEvent, ct }));
+                handler.GetType(),
+                ct => InvokeHandleAsync(handleMethod, handler, domainEvent, ct));
 
             _handleActions.Enqueue(handleAction);
             _logger.LogDebug(
                 "Invocation of {HandlerTypeName} for domain event {DomainEvent} registered. It will be executed on completion of operation",
-                injectedHandler.GetType().Name,
+                handler.GetType().Name,
                 domainEvent);
+        }
+    }
+
+    /// <summary>
+    ///     Invokes the handler through the (closed) <see cref="IDomainEventHandler{TDomainEvent}" /> interface method,
+    ///     which also works for explicit interface implementations, and rethrows the original exception instead of the
+    ///     wrapping <see cref="TargetInvocationException" />.
+    /// </summary>
+    private static Task InvokeHandleAsync(
+        MethodInfo handleMethod,
+        object handler,
+        object domainEvent,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            return (Task)handleMethod.Invoke(handler, new[] { domainEvent, cancellationToken })!;
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            throw; // never reached
         }
     }
 
@@ -64,7 +84,8 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
 
     public void PublishDomainEventsFromOutBox(DomainEventOutBox outBox)
     {
-        foreach (var domainEvent in outBox)
+        // draining prevents the same events from being published again on a subsequent call
+        foreach (var domainEvent in outBox.Drain())
         {
             PublishDomainEvent(domainEvent);
         }
@@ -79,7 +100,7 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
         }
     }
 
-    private class HandleAction
+    private sealed class HandleAction
     {
         private readonly Type _domainEventType;
         private readonly Type _handlerType;
@@ -111,6 +132,4 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
             }
         }
     }
-
-    private record struct Key(Type HandlerType, Type DomainEventType);
 }

@@ -1,4 +1,3 @@
-using System;
 using Backend.Fx.Exceptions;
 using Xunit;
 
