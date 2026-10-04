@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using Backend.Fx.Exceptions;
 using JetBrains.Annotations;
 
@@ -55,9 +55,22 @@ public static class StringValueObjectExtensions
     {
         var constructor = Constructors.GetOrAdd(
             typeof(T),
-            t => t.GetConstructor(new[] { typeof(string) }) ??
+            t => t.GetConstructor(
+                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                     null,
+                     new[] { typeof(string) },
+                     null) ??
                  throw new ArgumentException($"No constructor found for {t.Name} that accepts a string."));
 
-        return (T)constructor.Invoke(new object[] { value });
+        try
+        {
+            return (T)constructor.Invoke(new object[] { value });
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            // rethrow the validation exception of the value object's constructor, preserving its stack trace
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            throw; // never reached
+        }
     }
 }

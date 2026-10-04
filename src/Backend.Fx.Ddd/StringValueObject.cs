@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using JetBrains.Annotations;
 
@@ -24,18 +22,18 @@ public abstract class StringValueObject : ValueObject, IComparable<StringValueOb
     {
         if (value == null)
         {
-            throw new ArgumentNullException($"{GetType().Name} Value cannot be null.", nameof(value));
+            throw new ArgumentNullException(nameof(value), $"{GetType().Name} value cannot be null.");
         }
 
         if (minLength < 0)
         {
-            throw new ArgumentOutOfRangeException($"{GetType().Name} minLength cannot be negative.", nameof(minLength));
+            throw new ArgumentOutOfRangeException(nameof(minLength), $"{GetType().Name} minLength cannot be negative.");
         }
 
         if (maxLength < minLength)
         {
             throw new ArgumentOutOfRangeException(
-                $"{GetType().Name} minLength cannot be smaller than the min lenght or negative.", nameof(minLength));
+                nameof(maxLength), $"{GetType().Name} maxLength cannot be smaller than minLength.");
         }
 
         value = value.Trim();
@@ -76,12 +74,12 @@ public abstract class StringValueObject : ValueObject, IComparable<StringValueOb
         return Value;
     }
 
-    public static implicit operator string(StringValueObject svo)
+    public static implicit operator string?(StringValueObject? svo)
     {
-        return svo.Value;
+        return svo?.Value;
     }
 
-    public int CompareTo(StringValueObject other)
+    public int CompareTo(StringValueObject? other)
     {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;

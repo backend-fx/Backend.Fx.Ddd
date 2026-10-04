@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Backend.Fx.Execution.DependencyInjection;
 using Backend.Fx.Logging;
@@ -11,7 +9,7 @@ namespace Backend.Fx.Ddd.Feature;
 
 public class IdGenerationModule : IModule
 {
-    private readonly ILogger _logger = Log.Create<DomainEventsModule>();
+    private readonly ILogger _logger = Log.Create<IdGenerationModule>();
     private readonly IEnumerable<Assembly> _assemblies;
 
     public IdGenerationModule(IEnumerable<Assembly> assemblies)

@@ -65,6 +65,21 @@ public class TheStringValueObjectExtensions
     }
 
     [Fact]
+    public void CanCreateValueObjectWithNonPublicConstructor()
+    {
+        var sut = "abc".AsMandatoryValue<LimitedStringValue>();
+        Assert.Equal("abc", sut.Value);
+    }
+
+    [Fact]
+    public void ThrowsTheOriginalConstructorExceptionInsteadOfTargetInvocationException()
+    {
+        var exception = Assert.Throws<ArgumentException>(() => "abcd".AsMandatoryValue<LimitedStringValue>());
+        Assert.Equal("value", exception.ParamName);
+        Assert.Contains("cannot be longer than 3", exception.Message);
+    }
+
+    [Fact]
     public void CanCreateEmptyStringValue()
     {
         var sut = StringValueObject.Empty<MyStringValue>();

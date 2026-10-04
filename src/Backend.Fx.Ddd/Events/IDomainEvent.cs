@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Backend.Fx.Ddd.Events;
+﻿namespace Backend.Fx.Ddd.Events;
 
 /// <summary>
 /// Marker interface for domain events 
