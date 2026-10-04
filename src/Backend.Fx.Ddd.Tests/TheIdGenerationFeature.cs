@@ -20,7 +20,7 @@ public class TheIdGenerationFeature : IAsyncLifetime
         _app.AddFeature(new IdGenerationFeature());
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _app.BootAsync();
     }
@@ -52,10 +52,10 @@ public class TheIdGenerationFeature : IAsyncLifetime
     }
 
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         _app.Dispose();
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
 

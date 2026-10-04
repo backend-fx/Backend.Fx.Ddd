@@ -23,7 +23,7 @@ public class TheDomainEventsFeature : IAsyncLifetime
         _app.AddFeature(new DomainEventsFeature());
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _app.BootAsync();
     }
@@ -42,7 +42,7 @@ public class TheDomainEventsFeature : IAsyncLifetime
                 .MustNotHaveHappened();
 
             return Task.CompletedTask;
-        });
+        }, cancellation: TestContext.Current.CancellationToken);
 
         // now it must be handled
         A.CallTo(() => TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
@@ -70,7 +70,7 @@ public class TheDomainEventsFeature : IAsyncLifetime
                 .MustNotHaveHappened();
 
             return Task.CompletedTask;
-        });
+        }, cancellation: TestContext.Current.CancellationToken);
 
         // now it must be handled
         A.CallTo(() => TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
@@ -99,7 +99,7 @@ public class TheDomainEventsFeature : IAsyncLifetime
                 .MustNotHaveHappened();
 
             return Task.CompletedTask;
-        });
+        }, cancellation: TestContext.Current.CancellationToken);
 
         // now it must be handled
         A.CallTo(() => MultiTestEventHandler.Fake2.HandleAsync(domainEvent2, A<CancellationToken>._))
@@ -169,9 +169,9 @@ public class TheDomainEventsFeature : IAsyncLifetime
             new DebugExceptionLogger(),
             assemblies);
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
         _app.Dispose();
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 }
