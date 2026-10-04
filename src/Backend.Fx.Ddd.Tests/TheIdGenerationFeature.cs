@@ -66,15 +66,9 @@ public class TheIdGenerationFeature : IAsyncLifetime
             assemblies);
 
 
-    public class ThatId(Guid value) : Id<Guid>(value), IEquatable<ThatId>
-    {
-        public bool Equals(ThatId? other) => base.Equals(other);
-    }
+    public class ThatId(Guid value) : GuidId<ThatId>(value);
 
-    public class ThisId(long value) : LongId(value), IEquatable<ThisId>
-    {
-        public bool Equals(ThisId? other) => base.Equals(other);
-    }
+    public class ThisId(long value) : LongId<ThisId>(value);
 
     public class ThatIdGenerator : IIdGenerator<ThatId>
     {

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Reflection;
 using Backend.Fx.Ddd.Events;
 using Backend.Fx.Execution;

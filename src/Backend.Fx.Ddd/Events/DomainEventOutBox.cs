@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace Backend.Fx.Ddd.Events;

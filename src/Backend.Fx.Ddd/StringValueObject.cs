@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using JetBrains.Annotations;
 
@@ -24,18 +22,18 @@ public abstract class StringValueObject : ValueObject, IComparable<StringValueOb
     {
         if (value == null)
         {
-            throw new ArgumentNullException($"{GetType().Name} Value cannot be null.", nameof(value));
+            throw new ArgumentNullException(nameof(value), $"{GetType().Name} value cannot be null.");
         }
 
         if (minLength < 0)
         {
-            throw new ArgumentOutOfRangeException($"{GetType().Name} minLength cannot be negative.", nameof(minLength));
+            throw new ArgumentOutOfRangeException(nameof(minLength), $"{GetType().Name} minLength cannot be negative.");
         }
 
         if (maxLength < minLength)
         {
             throw new ArgumentOutOfRangeException(
-                $"{GetType().Name} minLength cannot be smaller than the min lenght or negative.", nameof(minLength));
+                nameof(maxLength), $"{GetType().Name} maxLength cannot be smaller than minLength.");
         }
 
         value = value.Trim();

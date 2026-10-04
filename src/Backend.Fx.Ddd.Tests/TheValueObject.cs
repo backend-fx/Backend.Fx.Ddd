@@ -82,6 +82,35 @@ public class TheValueObject
         Assert.True(_sut1 != _sut4);
     }
 
+    [Fact]
+    public void DifferentTypesWithSameComponentsAreNotEqual()
+    {
+        var sut = new Sut("Value");
+        var other = new OtherSut("Value");
+
+        Assert.False(sut.Equals(other));
+        Assert.False(((ValueObject)sut).Equals(other));
+        Assert.False(sut.Equals((object)other));
+        Assert.True(sut != other);
+        Assert.NotEqual(sut.GetHashCode(), other.GetHashCode());
+    }
+
+    [Fact]
+    public void CollectionValuedComponentsAreComparedStructurally()
+    {
+        var sut1 = new CollectionSut("a", "b");
+        var sut2 = new CollectionSut("a", "b");
+        var sut3 = new CollectionSut("a", "c");
+        var sut4 = new CollectionSut("a");
+
+        Assert.Equal(sut1, sut2);
+        Assert.True(sut1 == sut2);
+        Assert.Equal(sut1.GetHashCode(), sut2.GetHashCode());
+
+        Assert.NotEqual(sut1, sut3);
+        Assert.NotEqual(sut1, sut4);
+    }
+
     private class Sut(string? property) : ValueObject
     {
         [PublicAPI]
@@ -101,6 +130,28 @@ public class TheValueObject
         protected override IEnumerable<object?> GetEqualityComponents()
         {
             yield return Property;
+        }
+    }
+
+    private class OtherSut(string? property) : ValueObject
+    {
+        [PublicAPI]
+        public string? Property { get; } = property;
+
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Property;
+        }
+    }
+
+    private class CollectionSut(params string[] items) : ValueObject
+    {
+        [PublicAPI]
+        public IReadOnlyList<string> Items { get; } = items;
+
+        protected override IEnumerable<object?> GetEqualityComponents()
+        {
+            yield return Items;
         }
     }
 }
