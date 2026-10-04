@@ -74,12 +74,12 @@ public abstract class StringValueObject : ValueObject, IComparable<StringValueOb
         return Value;
     }
 
-    public static implicit operator string(StringValueObject svo)
+    public static implicit operator string?(StringValueObject? svo)
     {
-        return svo.Value;
+        return svo?.Value;
     }
 
-    public int CompareTo(StringValueObject other)
+    public int CompareTo(StringValueObject? other)
     {
         if (ReferenceEquals(this, other)) return 0;
         if (ReferenceEquals(null, other)) return 1;

@@ -149,6 +149,14 @@ public class TheStringValueObject
     }
 
     [Fact]
+    public void NullIsImplicitlyCastedToNullString()
+    {
+        MyStringValue? sut = null;
+        string? casted = sut;
+        Assert.Null(casted);
+    }
+
+    [Fact]
     public void ToStringIsAnImplicitCastToString()
     {
         var sut = new MyStringValue("a");
@@ -165,3 +173,10 @@ public class ConfigurableString(string value, int minLength = 0, int maxLength =
 
 public class AnotherStringValue(string value)
     : StringValueObject(value);
+
+public class LimitedStringValue : StringValueObject
+{
+    private LimitedStringValue(string value) : base(value, maxLength: 3)
+    {
+    }
+}
