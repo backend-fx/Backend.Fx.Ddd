@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/Backend.Fx.Ddd.Feature/Backend.Fx.Ddd.Feature.csproj" />
+  <Project Path="src/Backend.Fx.Ddd.Tests/Backend.Fx.Ddd.Tests.csproj" />
+  <Project Path="src/Backend.Fx.Ddd/Backend.Fx.Ddd.csproj" />
+</Solution>
