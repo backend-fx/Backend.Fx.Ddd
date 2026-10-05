@@ -35,8 +35,9 @@ public class TheDomainServiceFeature : IAsyncLifetime
     [Fact]
     public void DomainServicesAreScoped()
     {
-        Assert.Throws<ActivationException>(
-            () => _app.CompositionRoot.ServiceProvider.GetRequiredService<IMyService>());
+        Assert.Throws<ActivationException>(() =>
+            _app.CompositionRoot.ServiceProvider.GetRequiredService<IMyService>()
+        );
     }
 
     public ValueTask DisposeAsync()
@@ -45,12 +46,12 @@ public class TheDomainServiceFeature : IAsyncLifetime
         return ValueTask.CompletedTask;
     }
 
-
     private class TestApplication(params Assembly[] assemblies)
         : BackendFxApplication(
             new SimpleInjectorCompositionRoot(),
             new DebugExceptionLogger(),
-            assemblies);
+            assemblies
+        );
 
     [UsedImplicitly]
     public interface IMyService : IDomainService;

@@ -5,8 +5,8 @@ namespace Backend.Fx.Ddd;
 /// <summary>
 /// The root of an aggregate.
 /// </summary>
-public interface IAggregateRoot {}
-    
+public interface IAggregateRoot { }
+
 /// <summary>
 /// The root of an aggregate, identified by an id of type <see cref="TId"/>.
 /// </summary>

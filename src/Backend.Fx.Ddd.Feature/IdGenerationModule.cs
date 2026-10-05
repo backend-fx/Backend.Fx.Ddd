@@ -21,7 +21,7 @@ public class IdGenerationModule : IModule
     {
         RegisterIdGenerators(compositionRoot);
     }
-    
+
     private void RegisterIdGenerators(ICompositionRoot compositionRoot)
     {
         var genericIdGeneratorType = typeof(IIdGenerator<>);
@@ -37,12 +37,15 @@ public class IdGenerationModule : IModule
         {
             _logger.LogWarning("No implementors of IIdGenerator<> found");
         }
-        
+
         foreach (var idGeneratorType in idGeneratorTypes)
         {
             var implementedInterfaces = idGeneratorType
                 .GetInterfaces()
-                .Where(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == genericIdGeneratorType)
+                .Where(x =>
+                    x.GetTypeInfo().IsGenericType
+                    && x.GetGenericTypeDefinition() == genericIdGeneratorType
+                )
                 .ToArray();
 
             foreach (var implementedInterface in implementedInterfaces)
@@ -53,7 +56,8 @@ public class IdGenerationModule : IModule
                 _logger.LogDebug(
                     "Registered singleton IIdGenerator<{IdType}>: {Type}",
                     idType.GetDetailedTypeName(),
-                    idGeneratorType.GetDetailedTypeName());
+                    idGeneratorType.GetDetailedTypeName()
+                );
             }
         }
     }

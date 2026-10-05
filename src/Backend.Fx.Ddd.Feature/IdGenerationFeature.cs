@@ -7,7 +7,7 @@ namespace Backend.Fx.Ddd.Feature;
 
 /// <summary>
 /// The feature "Id Generation" makes sure that all implementations of <see cref="IIdGenerator{TId}"/> are registered
-/// as singleton instances. 
+/// as singleton instances.
 /// </summary>
 [PublicAPI]
 public class IdGenerationFeature : IFeature

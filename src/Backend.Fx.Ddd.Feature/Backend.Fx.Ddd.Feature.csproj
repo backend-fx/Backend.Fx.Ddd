@@ -1,24 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ImplicitUsings>true</ImplicitUsings>
+    <IncludeSymbols>true</IncludeSymbols>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <ImplicitUsings>true</ImplicitUsings>
-        <IncludeSymbols>true</IncludeSymbols>
-        <LangVersion>latest</LangVersion>
-        <Nullable>enable</Nullable>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <TargetFramework>netstandard2.0</TargetFramework>
-    </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Backend.Fx.Execution" Version="1.1.11" />
+    <PackageReference
+      Include="Microsoft.Extensions.DependencyInjection.Abstractions"
+      Version="10.0.12"
+    />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+    <PackageReference
+      Include="Microsoft.SourceLink.GitHub"
+      Version="10.0.401"
+      PrivateAssets="All"
+    />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Backend.Fx.Execution" Version="1.1.11" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.401" PrivateAssets="All" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Backend.Fx.Ddd\Backend.Fx.Ddd.csproj" />
-    </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\Backend.Fx.Ddd\Backend.Fx.Ddd.csproj" />
+  </ItemGroup>
 </Project>

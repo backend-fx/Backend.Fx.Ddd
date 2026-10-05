@@ -17,9 +17,12 @@ public abstract class ValueObject : IEquatable<ValueObject>
 
     public bool Equals(ValueObject? other)
     {
-        if (ReferenceEquals(this, other)) return true;
-        if (ReferenceEquals(null, other)) return false;
-        if (GetType() != other.GetType()) return false;
+        if (ReferenceEquals(this, other))
+            return true;
+        if (ReferenceEquals(null, other))
+            return false;
+        if (GetType() != other.GetType())
+            return false;
 
         return ComponentsEqual(GetEqualityComponents(), other.GetEqualityComponents());
     }
@@ -62,19 +65,25 @@ public abstract class ValueObject : IEquatable<ValueObject>
             var hasLeft = leftEnumerator.MoveNext();
             var hasRight = rightEnumerator.MoveNext();
 
-            if (hasLeft != hasRight) return false;
-            if (!hasLeft) return true;
-            if (!ComponentEquals(leftEnumerator.Current, rightEnumerator.Current)) return false;
+            if (hasLeft != hasRight)
+                return false;
+            if (!hasLeft)
+                return true;
+            if (!ComponentEquals(leftEnumerator.Current, rightEnumerator.Current))
+                return false;
         }
     }
 
     private static bool ComponentEquals(object? left, object? right)
     {
-        if (ReferenceEquals(left, right)) return true;
-        if (left is null || right is null) return false;
+        if (ReferenceEquals(left, right))
+            return true;
+        if (left is null || right is null)
+            return false;
 
         // strings are enumerable, but must be compared as a whole
-        if (left is string || right is string) return left.Equals(right);
+        if (left is string || right is string)
+            return left.Equals(right);
 
         if (left is IEnumerable leftEnumerable && right is IEnumerable rightEnumerable)
         {

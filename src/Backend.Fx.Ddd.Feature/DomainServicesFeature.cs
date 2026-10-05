@@ -14,7 +14,9 @@ public class DomainServicesFeature : IFeature
 {
     public void Enable(IBackendFxApplication application)
     {
-        application.CompositionRoot.RegisterModules(new DomainServicesModule(application.Assemblies));
+        application.CompositionRoot.RegisterModules(
+            new DomainServicesModule(application.Assemblies)
+        );
     }
 
     public IEnumerable<Assembly> Assemblies { get; } = [];

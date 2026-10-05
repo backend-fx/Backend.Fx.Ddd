@@ -73,7 +73,9 @@ public class TheStringValueObjectExtensions
     [Fact]
     public void ThrowsTheOriginalConstructorExceptionInsteadOfTargetInvocationException()
     {
-        var exception = Assert.Throws<ArgumentException>(() => "abcd".AsMandatoryValue<LimitedStringValue>());
+        var exception = Assert.Throws<ArgumentException>(() =>
+            "abcd".AsMandatoryValue<LimitedStringValue>()
+        );
         Assert.Equal("value", exception.ParamName);
         Assert.Contains("cannot be longer than 3", exception.Message);
     }

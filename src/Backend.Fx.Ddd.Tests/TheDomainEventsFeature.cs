@@ -31,23 +31,33 @@ public class TheDomainEventsFeature : IAsyncLifetime
     {
         var domainEvent = new TestEvent1();
 
-        await _app.Invoker.InvokeAsync((sp, _) =>
-        {
-            sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent);
+        await _app.Invoker.InvokeAsync(
+            (sp, _) =>
+            {
+                sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent);
 
-            // handling is postponed to the completion of the operation
-            A.CallTo(() => TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
-                .MustNotHaveHappened();
+                // handling is postponed to the completion of the operation
+                A.CallTo(() =>
+                        TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._)
+                    )
+                    .MustNotHaveHappened();
 
-            return Task.CompletedTask;
-        }, cancellation: TestContext.Current.CancellationToken);
+                return Task.CompletedTask;
+            },
+            cancellation: TestContext.Current.CancellationToken
+        );
 
         // now it must be handled
         A.CallTo(() => TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
 
         // this one was not touched
-        A.CallTo(() => UnusedTestEventHandler.Fake.HandleAsync(A<UnusedTestEvent>._, A<CancellationToken>._))
+        A.CallTo(() =>
+                UnusedTestEventHandler.Fake.HandleAsync(
+                    A<UnusedTestEvent>._,
+                    A<CancellationToken>._
+                )
+            )
             .MustNotHaveHappened();
     }
 
@@ -56,26 +66,36 @@ public class TheDomainEventsFeature : IAsyncLifetime
     {
         var domainEvent = new TestEvent1();
 
-        await _app.Invoker.InvokeAsync((sp, _) =>
-        {
-            var entity = new EntityWithDomainEvents();
-            entity.DomainEvents.Add(domainEvent);
+        await _app.Invoker.InvokeAsync(
+            (sp, _) =>
+            {
+                var entity = new EntityWithDomainEvents();
+                entity.DomainEvents.Add(domainEvent);
 
-            sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvents(entity);
+                sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvents(entity);
 
-            // handling is postponed to the completion of the operation
-            A.CallTo(() => TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
-                .MustNotHaveHappened();
+                // handling is postponed to the completion of the operation
+                A.CallTo(() =>
+                        TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._)
+                    )
+                    .MustNotHaveHappened();
 
-            return Task.CompletedTask;
-        }, cancellation: TestContext.Current.CancellationToken);
+                return Task.CompletedTask;
+            },
+            cancellation: TestContext.Current.CancellationToken
+        );
 
         // now it must be handled
         A.CallTo(() => TestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
 
         // this one was not touched
-        A.CallTo(() => UnusedTestEventHandler.Fake.HandleAsync(A<UnusedTestEvent>._, A<CancellationToken>._))
+        A.CallTo(() =>
+                UnusedTestEventHandler.Fake.HandleAsync(
+                    A<UnusedTestEvent>._,
+                    A<CancellationToken>._
+                )
+            )
             .MustNotHaveHappened();
     }
 
@@ -85,27 +105,43 @@ public class TheDomainEventsFeature : IAsyncLifetime
         var domainEvent2 = new TestEvent2();
         var domainEvent3 = new TestEvent3();
 
-        await _app.Invoker.InvokeAsync((sp, _) =>
-        {
-            sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent2);
-            sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent3);
+        await _app.Invoker.InvokeAsync(
+            (sp, _) =>
+            {
+                sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent2);
+                sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent3);
 
-            // handling is postponed to the completion of the operation
-            A.CallTo(() => MultiTestEventHandler.Fake2.HandleAsync(domainEvent2, A<CancellationToken>._))
-                .MustNotHaveHappened();
-            A.CallTo(() => MultiTestEventHandler.Fake3.HandleAsync(domainEvent3, A<CancellationToken>._))
-                .MustNotHaveHappened();
+                // handling is postponed to the completion of the operation
+                A.CallTo(() =>
+                        MultiTestEventHandler.Fake2.HandleAsync(
+                            domainEvent2,
+                            A<CancellationToken>._
+                        )
+                    )
+                    .MustNotHaveHappened();
+                A.CallTo(() =>
+                        MultiTestEventHandler.Fake3.HandleAsync(
+                            domainEvent3,
+                            A<CancellationToken>._
+                        )
+                    )
+                    .MustNotHaveHappened();
 
-            return Task.CompletedTask;
-        }, cancellation: TestContext.Current.CancellationToken);
+                return Task.CompletedTask;
+            },
+            cancellation: TestContext.Current.CancellationToken
+        );
 
         // now it must be handled
-        A.CallTo(() => MultiTestEventHandler.Fake2.HandleAsync(domainEvent2, A<CancellationToken>._))
+        A.CallTo(() =>
+                MultiTestEventHandler.Fake2.HandleAsync(domainEvent2, A<CancellationToken>._)
+            )
             .MustHaveHappenedOnceExactly();
-        A.CallTo(() => MultiTestEventHandler.Fake3.HandleAsync(domainEvent3, A<CancellationToken>._))
+        A.CallTo(() =>
+                MultiTestEventHandler.Fake3.HandleAsync(domainEvent3, A<CancellationToken>._)
+            )
             .MustHaveHappenedOnceExactly();
     }
-
 
     [Fact]
     public async Task OutBoxIsEmptiedOnPublishingSoEventsAreNotHandledTwice()
@@ -114,18 +150,23 @@ public class TheDomainEventsFeature : IAsyncLifetime
         var entity = new EntityWithDomainEvents();
         entity.DomainEvents.Add(domainEvent);
 
-        await _app.Invoker.InvokeAsync((sp, _) =>
-        {
-            var publisher = sp.GetRequiredService<IDomainEventPublisher>();
-            publisher.PublishDomainEvents(entity);
-            publisher.PublishDomainEvents(entity);
+        await _app.Invoker.InvokeAsync(
+            (sp, _) =>
+            {
+                var publisher = sp.GetRequiredService<IDomainEventPublisher>();
+                publisher.PublishDomainEvents(entity);
+                publisher.PublishDomainEvents(entity);
 
-            Assert.Equal(0, entity.DomainEvents.Count);
+                Assert.Equal(0, entity.DomainEvents.Count);
 
-            return Task.CompletedTask;
-        }, cancellation: TestContext.Current.CancellationToken);
+                return Task.CompletedTask;
+            },
+            cancellation: TestContext.Current.CancellationToken
+        );
 
-        A.CallTo(() => ExplicitTestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
+        A.CallTo(() =>
+                ExplicitTestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._)
+            )
             .MustHaveHappenedOnceExactly();
     }
 
@@ -153,25 +194,35 @@ public class TheDomainEventsFeature : IAsyncLifetime
     {
         var domainEvent = new TestEvent4();
 
-        await _app.Invoker.InvokeAsync((sp, _) =>
-        {
-            sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent);
-            return Task.CompletedTask;
-        }, cancellation: TestContext.Current.CancellationToken);
+        await _app.Invoker.InvokeAsync(
+            (sp, _) =>
+            {
+                sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(domainEvent);
+                return Task.CompletedTask;
+            },
+            cancellation: TestContext.Current.CancellationToken
+        );
 
-        A.CallTo(() => ExplicitTestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._))
+        A.CallTo(() =>
+                ExplicitTestEventHandler.Fake.HandleAsync(domainEvent, A<CancellationToken>._)
+            )
             .MustHaveHappenedOnceExactly();
     }
 
     [Fact]
     public async Task FailingHandlerThrowsTheOriginalException()
     {
-        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _app.Invoker.InvokeAsync((sp, _) =>
-            {
-                sp.GetRequiredService<IDomainEventPublisher>().PublishDomainEvent(new FailingTestEvent());
-                return Task.CompletedTask;
-            }, cancellation: TestContext.Current.CancellationToken));
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _app.Invoker.InvokeAsync(
+                (sp, _) =>
+                {
+                    sp.GetRequiredService<IDomainEventPublisher>()
+                        .PublishDomainEvent(new FailingTestEvent());
+                    return Task.CompletedTask;
+                },
+                cancellation: TestContext.Current.CancellationToken
+            )
+        );
 
         Assert.Equal("handler failed", exception.Message);
     }
@@ -196,11 +247,14 @@ public class TheDomainEventsFeature : IAsyncLifetime
     [UsedImplicitly]
     public class ExplicitTestEventHandler : IDomainEventHandler<TestEvent4>
     {
-        public static readonly IDomainEventHandler<TestEvent4> Fake = A.Fake<IDomainEventHandler<TestEvent4>>();
+        public static readonly IDomainEventHandler<TestEvent4> Fake = A.Fake<
+            IDomainEventHandler<TestEvent4>
+        >();
 
         async Task IDomainEventHandler<TestEvent4>.HandleAsync(
             TestEvent4 domainEvent,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             await Fake.HandleAsync(domainEvent, cancellationToken);
         }
@@ -209,7 +263,10 @@ public class TheDomainEventsFeature : IAsyncLifetime
     [UsedImplicitly]
     public class FailingTestEventHandler : IDomainEventHandler<FailingTestEvent>
     {
-        public Task HandleAsync(FailingTestEvent domainEvent, CancellationToken cancellationToken = default)
+        public Task HandleAsync(
+            FailingTestEvent domainEvent,
+            CancellationToken cancellationToken = default
+        )
         {
             throw new InvalidOperationException("handler failed");
         }
@@ -218,26 +275,43 @@ public class TheDomainEventsFeature : IAsyncLifetime
     [UsedImplicitly]
     public class TestEventHandler : IDomainEventHandler<TestEvent1>
     {
-        public static readonly IDomainEventHandler<TestEvent1> Fake = A.Fake<IDomainEventHandler<TestEvent1>>();
+        public static readonly IDomainEventHandler<TestEvent1> Fake = A.Fake<
+            IDomainEventHandler<TestEvent1>
+        >();
 
-        public async Task HandleAsync(TestEvent1 domainEvent1, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(
+            TestEvent1 domainEvent1,
+            CancellationToken cancellationToken = default
+        )
         {
             await Fake.HandleAsync(domainEvent1, cancellationToken);
         }
     }
 
     [UsedImplicitly]
-    public class MultiTestEventHandler : IDomainEventHandler<TestEvent2>, IDomainEventHandler<TestEvent3>
+    public class MultiTestEventHandler
+        : IDomainEventHandler<TestEvent2>,
+            IDomainEventHandler<TestEvent3>
     {
-        public static readonly IDomainEventHandler<TestEvent2> Fake2 = A.Fake<IDomainEventHandler<TestEvent2>>();
-        public static readonly IDomainEventHandler<TestEvent3> Fake3 = A.Fake<IDomainEventHandler<TestEvent3>>();
+        public static readonly IDomainEventHandler<TestEvent2> Fake2 = A.Fake<
+            IDomainEventHandler<TestEvent2>
+        >();
+        public static readonly IDomainEventHandler<TestEvent3> Fake3 = A.Fake<
+            IDomainEventHandler<TestEvent3>
+        >();
 
-        public async Task HandleAsync(TestEvent2 domainEvent, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(
+            TestEvent2 domainEvent,
+            CancellationToken cancellationToken = default
+        )
         {
             await Fake2.HandleAsync(domainEvent, cancellationToken);
         }
 
-        public async Task HandleAsync(TestEvent3 domainEvent, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(
+            TestEvent3 domainEvent,
+            CancellationToken cancellationToken = default
+        )
         {
             await Fake3.HandleAsync(domainEvent, cancellationToken);
         }
@@ -249,10 +323,14 @@ public class TheDomainEventsFeature : IAsyncLifetime
     [UsedImplicitly]
     public class UnusedTestEventHandler : IDomainEventHandler<UnusedTestEvent>
     {
-        public static readonly IDomainEventHandler<UnusedTestEvent> Fake =
-            A.Fake<IDomainEventHandler<UnusedTestEvent>>();
+        public static readonly IDomainEventHandler<UnusedTestEvent> Fake = A.Fake<
+            IDomainEventHandler<UnusedTestEvent>
+        >();
 
-        public async Task HandleAsync(UnusedTestEvent domainEvent, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(
+            UnusedTestEvent domainEvent,
+            CancellationToken cancellationToken = default
+        )
         {
             await Fake.HandleAsync(domainEvent, cancellationToken);
         }
@@ -262,7 +340,8 @@ public class TheDomainEventsFeature : IAsyncLifetime
         : BackendFxApplication(
             new SimpleInjectorCompositionRoot(),
             new DebugExceptionLogger(),
-            assemblies);
+            assemblies
+        );
 
     public ValueTask DisposeAsync()
     {
