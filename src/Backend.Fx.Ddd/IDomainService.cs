@@ -3,6 +3,4 @@
 /// <summary>
 /// A marker interface for domain services.
 /// </summary>
-public interface IDomainService
-{
-}
+public interface IDomainService { }

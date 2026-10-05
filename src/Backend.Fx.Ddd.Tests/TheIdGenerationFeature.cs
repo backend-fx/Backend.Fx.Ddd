@@ -26,14 +26,16 @@ public class TheIdGenerationFeature : IAsyncLifetime
     [Fact]
     public void IdGeneratorsAreRegisteredAsSingletons()
     {
-        var singleton = _app.CompositionRoot.ServiceProvider.GetRequiredService<IIdGenerator<ThatId>>();
-        
+        var singleton = _app.CompositionRoot.ServiceProvider.GetRequiredService<
+            IIdGenerator<ThatId>
+        >();
+
         using var scope = _app.CompositionRoot.BeginScope();
         var scoped = scope.ServiceProvider.GetRequiredService<IIdGenerator<ThatId>>();
-        
+
         Assert.StrictEqual(singleton, scoped);
     }
-    
+
     [Fact]
     public void RegistersAndResolvesIdGenerators()
     {
@@ -42,13 +44,12 @@ public class TheIdGenerationFeature : IAsyncLifetime
         var thatId1 = thatIdGenerator.NextId();
         var thatId2 = thatIdGenerator.NextId();
         Assert.NotEqual(thatId1, thatId2);
-        
+
         var thisIdGenerator = scope.ServiceProvider.GetRequiredService<IIdGenerator<ThisId>>();
         var thisId1 = thisIdGenerator.NextId();
         var thisId2 = thisIdGenerator.NextId();
         Assert.NotEqual(thisId1, thisId2);
     }
-
 
     public ValueTask DisposeAsync()
     {
@@ -56,13 +57,12 @@ public class TheIdGenerationFeature : IAsyncLifetime
         return ValueTask.CompletedTask;
     }
 
-
     private class TestApplication(params Assembly[] assemblies)
         : BackendFxApplication(
             new SimpleInjectorCompositionRoot(),
             new DebugExceptionLogger(),
-            assemblies);
-
+            assemblies
+        );
 
     public class ThatId(Guid value) : GuidId<ThatId>(value);
 
@@ -76,6 +76,7 @@ public class TheIdGenerationFeature : IAsyncLifetime
     public class ThisIdGenerator : IIdGenerator<ThisId>
     {
         private int _nextId = 1;
+
         public ThisId NextId() => new(_nextId++);
     }
 }

@@ -4,11 +4,12 @@ using JetBrains.Annotations;
 namespace Backend.Fx.Ddd;
 
 /// <summary>
-/// Encapsulates methods for retrieving domain objects 
+/// Encapsulates methods for retrieving domain objects
 /// See https://en.wikipedia.org/wiki/Domain-driven_design#Building_blocks
 /// </summary>
 [PublicAPI]
-public interface IRepository<TAggregateRoot, in TId> where TAggregateRoot : class, IAggregateRoot<TId>
+public interface IRepository<TAggregateRoot, in TId>
+    where TAggregateRoot : class, IAggregateRoot<TId>
     where TId : IEquatable<TId>
 {
     /// <summary>
@@ -25,7 +26,10 @@ public interface IRepository<TAggregateRoot, in TId> where TAggregateRoot : clas
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<TAggregateRoot?> GetByIdOrDefaultAsync(TId id, CancellationToken cancellationToken = default);
+    Task<TAggregateRoot?> GetByIdOrDefaultAsync(
+        TId id,
+        CancellationToken cancellationToken = default
+    );
 
     Task<TAggregateRoot[]> GetAllAsync(CancellationToken cancellationToken = default);
 

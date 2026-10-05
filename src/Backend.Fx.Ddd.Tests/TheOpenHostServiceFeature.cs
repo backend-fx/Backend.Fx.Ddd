@@ -43,12 +43,12 @@ public class TheOpenHostServiceFeature : IAsyncLifetime
         return ValueTask.CompletedTask;
     }
 
-
     private class TestApplication(params Assembly[] assemblies)
         : BackendFxApplication(
             new SimpleInjectorCompositionRoot(),
             new DebugExceptionLogger(),
-            assemblies);
+            assemblies
+        );
 
     [UsedImplicitly]
     public interface IMyService : IOpenHostService;

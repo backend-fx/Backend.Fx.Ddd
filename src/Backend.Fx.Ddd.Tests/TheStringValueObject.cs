@@ -19,7 +19,9 @@ public class TheStringValueObject
     [Fact]
     public void CannotBeCreatedWithNegativeMaxLength()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => new ConfigurableString("a", maxLength: -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new ConfigurableString("a", maxLength: -1)
+        );
     }
 
     [Fact]
@@ -163,19 +165,15 @@ public class TheStringValueObject
     }
 }
 
-public class MyStringValue(string value)
-    : StringValueObject(value);
-
+public class MyStringValue(string value) : StringValueObject(value);
 
 public class ConfigurableString(string value, int minLength = 0, int maxLength = int.MaxValue)
     : StringValueObject(value, minLength, maxLength);
 
-public class AnotherStringValue(string value)
-    : StringValueObject(value);
+public class AnotherStringValue(string value) : StringValueObject(value);
 
 public class LimitedStringValue : StringValueObject
 {
-    private LimitedStringValue(string value) : base(value, maxLength: 3)
-    {
-    }
+    private LimitedStringValue(string value)
+        : base(value, maxLength: 3) { }
 }

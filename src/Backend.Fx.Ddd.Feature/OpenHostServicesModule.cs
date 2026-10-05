@@ -25,24 +25,33 @@ internal class OpenHostServicesModule : IModule
     private void RegisterOpenHostServices(ICompositionRoot container)
     {
         var assembliesForLogging = string.Join(",", _assemblies.Select(ass => ass.GetName().Name));
-        _logger.LogDebug("Registering domain and application services from {Assemblies}", assembliesForLogging);
+        _logger.LogDebug(
+            "Registering domain and application services from {Assemblies}",
+            assembliesForLogging
+        );
 
         var serviceDescriptors = _assemblies
-                                 .GetImplementingTypes(typeof(IOpenHostService))
-                                 .SelectMany(type =>
-                                     type.GetTypeInfo()
-                                         .ImplementedInterfaces
-                                         .Where(i => typeof(IOpenHostService) != i &&
-                                                     _assemblies.Contains(i.GetTypeInfo().Assembly))
-                                         .Select(service =>
-                                             new ServiceDescriptor(service, type, ServiceLifetime.Singleton)));
-
+            .GetImplementingTypes(typeof(IOpenHostService))
+            .SelectMany(type =>
+                type.GetTypeInfo()
+                    .ImplementedInterfaces.Where(i =>
+                        typeof(IOpenHostService) != i
+                        && _assemblies.Contains(i.GetTypeInfo().Assembly)
+                    )
+                    .Select(service => new ServiceDescriptor(
+                        service,
+                        type,
+                        ServiceLifetime.Singleton
+                    ))
+            );
 
         foreach (ServiceDescriptor serviceDescriptor in serviceDescriptors)
         {
-            _logger.LogDebug("Registering singleton service {ServiceType} with implementation {ImplementationType}",
+            _logger.LogDebug(
+                "Registering singleton service {ServiceType} with implementation {ImplementationType}",
                 serviceDescriptor.ServiceType.Name,
-                serviceDescriptor.ImplementationType?.Name ?? "dynamic");
+                serviceDescriptor.ImplementationType?.Name ?? "dynamic"
+            );
 
             container.Register(serviceDescriptor);
         }

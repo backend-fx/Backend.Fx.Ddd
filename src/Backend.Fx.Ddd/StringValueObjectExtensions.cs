@@ -18,7 +18,8 @@ public static class StringValueObjectExtensions
     /// <param name="value"></param>
     /// <typeparam name="T"></typeparam>
     /// <returns>A string value object ot type <c>T</c> containing the given string value or <c>string.Empty</c></returns>
-    public static T AsOptionalValue<T>(this string? value) where T : StringValueObject
+    public static T AsOptionalValue<T>(this string? value)
+        where T : StringValueObject
     {
         return Create<T>(value ?? string.Empty);
     }
@@ -28,12 +29,16 @@ public static class StringValueObjectExtensions
     ///     otherwise the typed value object containing the original string is returned
     /// </summary>
     /// <exception cref="ArgumentNullException">The string is null or empty</exception>
-    public static T AsMandatoryValue<T>(this string? value) where T : StringValueObject
+    public static T AsMandatoryValue<T>(this string? value)
+        where T : StringValueObject
     {
         value = value?.Trim();
         if (string.IsNullOrEmpty(value))
         {
-            throw new ArgumentNullException(nameof(value), $"{typeof(T).Name} cannot be null or empty.");
+            throw new ArgumentNullException(
+                nameof(value),
+                $"{typeof(T).Name} cannot be null or empty."
+            );
         }
 
         return Create<T>(value!);
@@ -47,20 +52,29 @@ public static class StringValueObjectExtensions
         where T : StringValueObject
     {
         value = value?.Trim();
-        exceptionBuilder.AddIf(string.IsNullOrEmpty(value), $"{typeof(T).Name} cannot be null or empty");
+        exceptionBuilder.AddIf(
+            string.IsNullOrEmpty(value),
+            $"{typeof(T).Name} cannot be null or empty"
+        );
         return Create<T>(value ?? string.Empty);
     }
 
-    private static T Create<T>(string value) where T : StringValueObject
+    private static T Create<T>(string value)
+        where T : StringValueObject
     {
         var constructor = Constructors.GetOrAdd(
             typeof(T),
-            t => t.GetConstructor(
-                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                     null,
-                     new[] { typeof(string) },
-                     null) ??
-                 throw new ArgumentException($"No constructor found for {t.Name} that accepts a string."));
+            t =>
+                t.GetConstructor(
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                    null,
+                    new[] { typeof(string) },
+                    null
+                )
+                ?? throw new ArgumentException(
+                    $"No constructor found for {t.Name} that accepts a string."
+                )
+        );
 
         try
         {

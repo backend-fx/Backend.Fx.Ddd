@@ -14,7 +14,9 @@ public class OpenHostServicesFeature : IFeature
 {
     public void Enable(IBackendFxApplication application)
     {
-        application.CompositionRoot.RegisterModules(new OpenHostServicesModule(application.Assemblies));
+        application.CompositionRoot.RegisterModules(
+            new OpenHostServicesModule(application.Assemblies)
+        );
     }
 
     public IEnumerable<Assembly> Assemblies { get; } = [];

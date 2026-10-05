@@ -14,7 +14,9 @@ public abstract class Identified<TId> : IEquatable<Identified<TId>>
     /// This ctor is only here to allow O/R-Mappers to materialize an object coming from a persistent
     /// store using reflection.
     /// </summary>
-    [Obsolete("This ctor is only here to allow O/R-Mappers to materialize an object coming from a persistent")]
+    [Obsolete(
+        "This ctor is only here to allow O/R-Mappers to materialize an object coming from a persistent"
+    )]
     protected Identified()
     {
         Id = default!;
@@ -25,7 +27,8 @@ public abstract class Identified<TId> : IEquatable<Identified<TId>>
         Id = id;
     }
 
-    [UsedImplicitly] public string DebuggerDisplay => $"{GetType().Name}[{Id}]";
+    [UsedImplicitly]
+    public string DebuggerDisplay => $"{GetType().Name}[{Id}]";
 
     public bool Equals(Identified<TId> other)
     {
@@ -45,11 +48,12 @@ public abstract class Identified<TId> : IEquatable<Identified<TId>>
 
     public static bool operator ==(Identified<TId>? left, Identified<TId>? right)
     {
-        if (ReferenceEquals(left, null) && ReferenceEquals(right, null)) return true;
-        if (ReferenceEquals(left, null) || ReferenceEquals(right, null)) return false;
+        if (ReferenceEquals(left, null) && ReferenceEquals(right, null))
+            return true;
+        if (ReferenceEquals(left, null) || ReferenceEquals(right, null))
+            return false;
 
         return ReferenceEquals(left, right) || Equals(right.Id, left.Id);
-
     }
 
     public static bool operator !=(Identified<TId>? left, Identified<TId>? right)

@@ -20,15 +20,26 @@ internal class DomainEventsModule : IModule
     public void Register(ICompositionRoot compositionRoot)
     {
         compositionRoot.Register(
-            ServiceDescriptor.Scoped(sp => new DomainEventAggregator(new DomainEventHandlerProvider(sp))));
+            ServiceDescriptor.Scoped(sp => new DomainEventAggregator(
+                new DomainEventHandlerProvider(sp)
+            ))
+        );
 
         compositionRoot.Register(
-            ServiceDescriptor.Scoped<IDomainEventAggregator>(sp => sp.GetRequiredService<DomainEventAggregator>()));
+            ServiceDescriptor.Scoped<IDomainEventAggregator>(sp =>
+                sp.GetRequiredService<DomainEventAggregator>()
+            )
+        );
 
         compositionRoot.Register(
-            ServiceDescriptor.Scoped<IDomainEventPublisher>(sp => sp.GetRequiredService<DomainEventAggregator>()));
+            ServiceDescriptor.Scoped<IDomainEventPublisher>(sp =>
+                sp.GetRequiredService<DomainEventAggregator>()
+            )
+        );
 
-        compositionRoot.RegisterDecorator(ServiceDescriptor.Scoped<IOperation, RaiseDomainEventsOperationDecorator>());
+        compositionRoot.RegisterDecorator(
+            ServiceDescriptor.Scoped<IOperation, RaiseDomainEventsOperationDecorator>()
+        );
 
         RegisterDomainEventHandlers(compositionRoot);
     }
@@ -48,7 +59,9 @@ internal class DomainEventsModule : IModule
             // a handler could handle various domain events, so we have to loop over the interface
             var implementedInterfaces = handlerType
                 .GetInterfaces()
-                .Where(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>))
+                .Where(t =>
+                    t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>)
+                )
                 .ToArray();
 
             foreach (var implementedInterface in implementedInterfaces)
@@ -60,7 +73,9 @@ internal class DomainEventsModule : IModule
                 }
                 else
                 {
-                    domainEventTypeToHandlerTypesMap[domainEventType] = new List<Type>([handlerType]);
+                    domainEventTypeToHandlerTypesMap[domainEventType] = new List<Type>([
+                        handlerType,
+                    ]);
                 }
             }
         }
@@ -69,12 +84,16 @@ internal class DomainEventsModule : IModule
         {
             var domainEventType = registration.Key;
             var handlerService = typeof(IDomainEventHandler<>).MakeGenericType(domainEventType);
-            var serviceDescriptors = registration.Value.Select(
-                handlerType => new ServiceDescriptor(handlerService, handlerType, ServiceLifetime.Scoped)).ToArray();
+            var serviceDescriptors = registration
+                .Value.Select(handlerType => new ServiceDescriptor(
+                    handlerService,
+                    handlerType,
+                    ServiceLifetime.Scoped
+                ))
+                .ToArray();
             compositionRoot.RegisterCollection(serviceDescriptors);
         }
     }
-
 
     [UsedImplicitly]
     public class RaiseDomainEventsOperationDecorator : IOperation
@@ -84,13 +103,17 @@ internal class DomainEventsModule : IModule
 
         public RaiseDomainEventsOperationDecorator(
             IDomainEventAggregator domainEventAggregator,
-            IOperation operation)
+            IOperation operation
+        )
         {
             _domainEventAggregator = domainEventAggregator;
             _operation = operation;
         }
 
-        public Task BeginAsync(IServiceScope serviceScope, CancellationToken cancellationToken = default)
+        public Task BeginAsync(
+            IServiceScope serviceScope,
+            CancellationToken cancellationToken = default
+        )
         {
             return _operation.BeginAsync(serviceScope, cancellationToken);
         }

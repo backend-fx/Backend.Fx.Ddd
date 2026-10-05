@@ -11,8 +11,8 @@ public interface IDomainEventPublisher
     /// </summary>
     /// <param name="domainEvent"></param>
     void PublishDomainEvent(object domainEvent);
-    
+
     void PublishDomainEventsFromOutBox(DomainEventOutBox outBox);
-    
+
     void PublishDomainEvents(IHaveDomainEvents entity);
 }

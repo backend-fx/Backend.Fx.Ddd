@@ -28,30 +28,37 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
         _domainEventHandlerProvider = domainEventHandlerProvider;
     }
 
-    public void PublishDomainEvent(object domainEvent) 
+    public void PublishDomainEvent(object domainEvent)
     {
         var domainEventType = domainEvent.GetType();
         var handleMethod = HandleMethods.GetOrAdd(
             domainEventType,
-            t => typeof(IDomainEventHandler<>)
-                     .MakeGenericType(t)
-                     .GetMethod(nameof(IDomainEventHandler<object>.HandleAsync))
-                 ?? throw new InvalidOperationException(
-                     $"IDomainEventHandler<{t.Name}>.HandleAsync could not be found"));
+            t =>
+                typeof(IDomainEventHandler<>)
+                    .MakeGenericType(t)
+                    .GetMethod(nameof(IDomainEventHandler<object>.HandleAsync))
+                ?? throw new InvalidOperationException(
+                    $"IDomainEventHandler<{t.Name}>.HandleAsync could not be found"
+                )
+        );
 
-        foreach (var injectedHandler in _domainEventHandlerProvider.GetAllEventHandlers(domainEventType))
+        foreach (
+            var injectedHandler in _domainEventHandlerProvider.GetAllEventHandlers(domainEventType)
+        )
         {
             var handler = injectedHandler;
             var handleAction = new HandleAction(
                 domainEventType,
                 handler.GetType(),
-                ct => InvokeHandleAsync(handleMethod, handler, domainEvent, ct));
+                ct => InvokeHandleAsync(handleMethod, handler, domainEvent, ct)
+            );
 
             _handleActions.Enqueue(handleAction);
             _logger.LogDebug(
                 "Invocation of {HandlerTypeName} for domain event {DomainEvent} registered. It will be executed on completion of operation",
                 handler.GetType().Name,
-                domainEvent);
+                domainEvent
+            );
         }
     }
 
@@ -64,7 +71,8 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
         MethodInfo handleMethod,
         object handler,
         object domainEvent,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken
+    )
     {
         try
         {
@@ -91,7 +99,6 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
         }
     }
 
-
     public async Task RaiseEventsAsync(CancellationToken cancellationToken = default)
     {
         while (_handleActions.TryDequeue(out var handleAction))
@@ -106,13 +113,16 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
         private readonly Type _handlerType;
         private readonly Func<CancellationToken, Task> _asyncAction;
 
-        public HandleAction(Type domainEventType, Type handlerType, Func<CancellationToken, Task> asyncAction)
+        public HandleAction(
+            Type domainEventType,
+            Type handlerType,
+            Func<CancellationToken, Task> asyncAction
+        )
         {
             _domainEventType = domainEventType;
             _handlerType = handlerType;
             _asyncAction = asyncAction;
         }
-
 
         public async Task InvokeAsync(CancellationToken cancellationToken)
         {
@@ -124,10 +134,12 @@ public class DomainEventAggregator : IDomainEventAggregator, IDomainEventPublish
             }
             catch (Exception ex)
             {
-                logger.LogError(ex,
+                logger.LogError(
+                    ex,
                     "Handling of {DomainEvent} by {HandlerTypeName} failed",
                     _domainEventType.Name,
-                    _handlerType.Name);
+                    _handlerType.Name
+                );
                 throw;
             }
         }

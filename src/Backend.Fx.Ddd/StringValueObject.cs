@@ -22,30 +22,44 @@ public abstract class StringValueObject : ValueObject, IComparable<StringValueOb
     {
         if (value == null)
         {
-            throw new ArgumentNullException(nameof(value), $"{GetType().Name} value cannot be null.");
+            throw new ArgumentNullException(
+                nameof(value),
+                $"{GetType().Name} value cannot be null."
+            );
         }
 
         if (minLength < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(minLength), $"{GetType().Name} minLength cannot be negative.");
+            throw new ArgumentOutOfRangeException(
+                nameof(minLength),
+                $"{GetType().Name} minLength cannot be negative."
+            );
         }
 
         if (maxLength < minLength)
         {
             throw new ArgumentOutOfRangeException(
-                nameof(maxLength), $"{GetType().Name} maxLength cannot be smaller than minLength.");
+                nameof(maxLength),
+                $"{GetType().Name} maxLength cannot be smaller than minLength."
+            );
         }
 
         value = value.Trim();
 
         if (value.Length < minLength)
         {
-            throw new ArgumentException($"{GetType().Name} value cannot be shorter than {minLength}.", nameof(value));
+            throw new ArgumentException(
+                $"{GetType().Name} value cannot be shorter than {minLength}.",
+                nameof(value)
+            );
         }
 
         if (value.Length > maxLength)
         {
-            throw new ArgumentException($"{GetType().Name} value cannot be longer than {maxLength}.", nameof(value));
+            throw new ArgumentException(
+                $"{GetType().Name} value cannot be longer than {maxLength}.",
+                nameof(value)
+            );
         }
 
         Value = value;
@@ -59,7 +73,8 @@ public abstract class StringValueObject : ValueObject, IComparable<StringValueOb
 
     public int Length => Value.Length;
 
-    public static T Empty<T>() where T : StringValueObject
+    public static T Empty<T>()
+        where T : StringValueObject
     {
         return string.Empty.AsOptionalValue<T>();
     }
@@ -81,8 +96,10 @@ public abstract class StringValueObject : ValueObject, IComparable<StringValueOb
 
     public int CompareTo(StringValueObject? other)
     {
-        if (ReferenceEquals(this, other)) return 0;
-        if (ReferenceEquals(null, other)) return 1;
+        if (ReferenceEquals(this, other))
+            return 0;
+        if (ReferenceEquals(null, other))
+            return 1;
         return string.Compare(Value, other.Value, StringComparison.Ordinal);
     }
 }

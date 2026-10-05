@@ -10,18 +10,21 @@ public abstract class Id
 
     protected static string GetTypeName(Type idType)
     {
-        return TypeNameCache.GetOrAdd(idType, t =>
-        {
-            string idTypeName = t.Name;
-
-            // a type that is literally named "Id" keeps its name, stripping the suffix would leave an empty string
-            if (idTypeName.Length > 2 && idTypeName.EndsWith("Id", StringComparison.Ordinal))
+        return TypeNameCache.GetOrAdd(
+            idType,
+            t =>
             {
-                idTypeName = idTypeName.Substring(0, idTypeName.Length - 2);
-            }
+                string idTypeName = t.Name;
 
-            return idTypeName;
-        });
+                // a type that is literally named "Id" keeps its name, stripping the suffix would leave an empty string
+                if (idTypeName.Length > 2 && idTypeName.EndsWith("Id", StringComparison.Ordinal))
+                {
+                    idTypeName = idTypeName.Substring(0, idTypeName.Length - 2);
+                }
+
+                return idTypeName;
+            }
+        );
     }
 }
 
@@ -41,7 +44,10 @@ public abstract class Id<TSelf, TValue> : Id, IEquatable<TSelf>
     {
         if (value.Equals(default))
         {
-            throw new ArgumentException($"The {GetTypeName(GetType())} ID value must be specified.", nameof(value));
+            throw new ArgumentException(
+                $"The {GetTypeName(GetType())} ID value must be specified.",
+                nameof(value)
+            );
         }
 
         Value = value;
@@ -74,8 +80,10 @@ public abstract class Id<TSelf, TValue> : Id, IEquatable<TSelf>
 
     public static bool operator ==(Id<TSelf, TValue>? left, Id<TSelf, TValue>? right)
     {
-        if (ReferenceEquals(left, right)) return true;
-        if (left is null || right is null) return false;
+        if (ReferenceEquals(left, right))
+            return true;
+        if (left is null || right is null)
+            return false;
         return left.Equals(right as TSelf);
     }
 
@@ -86,9 +94,11 @@ public abstract class Id<TSelf, TValue> : Id, IEquatable<TSelf>
 }
 
 [PublicAPI]
-public abstract class IntId<TSelf> : Id<TSelf, int> where TSelf : IntId<TSelf>
+public abstract class IntId<TSelf> : Id<TSelf, int>
+    where TSelf : IntId<TSelf>
 {
-    protected IntId(int value) : base(value)
+    protected IntId(int value)
+        : base(value)
     {
         if (value < 0)
         {
@@ -98,9 +108,11 @@ public abstract class IntId<TSelf> : Id<TSelf, int> where TSelf : IntId<TSelf>
 }
 
 [PublicAPI]
-public abstract class LongId<TSelf> : Id<TSelf, long> where TSelf : LongId<TSelf>
+public abstract class LongId<TSelf> : Id<TSelf, long>
+    where TSelf : LongId<TSelf>
 {
-    protected LongId(long value) : base(value)
+    protected LongId(long value)
+        : base(value)
     {
         if (value < 0)
         {
@@ -110,9 +122,9 @@ public abstract class LongId<TSelf> : Id<TSelf, long> where TSelf : LongId<TSelf
 }
 
 [PublicAPI]
-public abstract class GuidId<TSelf> : Id<TSelf, Guid> where TSelf : GuidId<TSelf>
+public abstract class GuidId<TSelf> : Id<TSelf, Guid>
+    where TSelf : GuidId<TSelf>
 {
-    protected GuidId(Guid value) : base(value)
-    {
-    }
+    protected GuidId(Guid value)
+        : base(value) { }
 }
